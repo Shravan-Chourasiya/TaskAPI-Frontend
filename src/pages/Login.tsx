@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, Terminal } from 'lucide-react';
 import axios from 'axios';
 import { config } from '../utils/config';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -11,7 +11,8 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const [user,setUser] = useState(null);
+  // const { setUser } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,9 +25,10 @@ const Login: React.FC = () => {
         { usernameORemail: email, password },
         { withCredentials: true }
       );
-      setUser(res.data.user);
+      console.log(user);
+      setUser(res.data.data || res.data.user || null);
       navigate('/dashboard');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {

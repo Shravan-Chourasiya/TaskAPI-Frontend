@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider, useLocation, Outlet } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import Layout from './components/Layout';
+import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -54,21 +52,20 @@ const router = createBrowserRouter([
       { path: '*', element: <NotFound /> },
 
       // Protected Routes
-      { 
-        path: '/pricing', 
+      {
+        path: '/pricing',
         element: (
-          <ProtectedRoute>
-            <Pricing />
-          </ProtectedRoute>
-        ) 
+          <Pricing />
+
+        )
       },
-      { 
-        path: '/docs', 
+      {
+        path: '/docs',
         element: (
-          <ProtectedRoute>
-            <Docs />
-          </ProtectedRoute>
-        ) 
+
+          <Docs />
+
+        )
       },
     ],
   },
@@ -76,8 +73,8 @@ const router = createBrowserRouter([
 
 export default function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+
+    <RouterProvider router={router} />
+
   );
 }

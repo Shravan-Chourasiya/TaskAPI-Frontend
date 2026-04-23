@@ -6,7 +6,11 @@ export function getEnvVar(name: string): string {
 	return value;
 }
 export function getEnvVarNum(name: string): number {
-	const value = import.meta.env[name];
+	const val = import.meta.env[name];
+const value = Number(val);
+	if (isNaN(value)) {
+		throw new Error(`Environment variable ${name} is not a valid number`);
+	}
 	if (!value) {
 		throw new Error(`Missing environment variable: ${name}`);
 	}
@@ -31,7 +35,7 @@ export function getCookieVar(name: string): object {
 		val.expires = new Date(Date.now() + val.maxAge);
 		return val;
 	} catch (error) {
-        console.log(error);
+		console.log(error);
 		throw new Error(`Invalid JSON in environment variable: ${name}`);
 	}
 }

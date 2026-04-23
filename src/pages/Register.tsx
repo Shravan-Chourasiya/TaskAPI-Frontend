@@ -72,8 +72,9 @@ const Register: React.FC = () => {
 
     try {
       await axios.post(
-        `${config.SERVER_URL}/api/v1/auth/verify`,
-        { otp: normalizedOtp },
+        `${config.SERVER_URL}/api/v1/auth/verify?purpose=ve-em-or`,
+        { otp: normalizedOtp ,
+        },
       );
       setOtpSuccess(true);
       setTimeout(() => navigate('/dashboard'), 2000);

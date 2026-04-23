@@ -1,19 +1,17 @@
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext';
 import { LogOut, LayoutDashboard } from 'lucide-react';
 import axios from 'axios';
-import { config } from '../utils/config';
-import { Button } from './ui/button';
+import { config } from '../../utils/config';
+import { Button } from '../ui/button';
 
 const Navbar = () => {
-    const { user, logout } = useAuth();
 
     const handleLogout = async () => {
         try {
             await axios.delete(`${config.SERVER_URL}/api/v1/auth/logout`, {
                 withCredentials: true
             });
-            logout();
         } catch (error) {
             console.error('Logout failed:', error);
         }
@@ -41,8 +39,7 @@ const Navbar = () => {
                 </nav>
 
                 <div className="flex items-center gap-3">
-                    {user ? (
-                        <>
+                    {/* {user ? ( */}
                             <NavLink 
                                 to='/dashboard' 
                                 className="bg-primary hover:bg-primary-container text-on-primary rounded-full px-6 py-2 text-sm font-bold transition-colors flex items-center gap-2"
@@ -57,15 +54,14 @@ const Navbar = () => {
                                 <LogOut className="w-4 h-4" />
                                 Logout
                             </Button>
-                        </>
-                    ) : (
+                    {/* ) : (
                         <NavLink 
                             to='/login' 
                             className="bg-primary hover:bg-primary-container text-on-primary rounded-full px-6 py-2 text-sm font-bold transition-colors"
                         >
                             Get Alpha Access
                         </NavLink>
-                    )}
+                    )} */}
                 </div>
             </div>
         </header>
