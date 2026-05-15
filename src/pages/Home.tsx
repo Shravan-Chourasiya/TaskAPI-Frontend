@@ -22,7 +22,7 @@ const Home: React.FC = () => {
             </p>
             
             <div className="flex flex-wrap gap-4 pt-4">
-              <Link to="/login" className="bg-primary text-on-primary px-8 py-4 rounded-md font-bold hover:bg-primary-container transition-[background-color,box-shadow,transform] hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center gap-2 shadow-ambient hover:shadow-ambient-hover">
+              <Link to="/pricing" className="bg-primary text-on-primary px-8 py-4 rounded-md font-bold hover:bg-primary-container transition-[background-color,box-shadow,transform] hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center gap-2 shadow-ambient hover:shadow-ambient-hover">
                 Get Started
                 <ArrowRight className="w-4 h-4" />
               </Link>
