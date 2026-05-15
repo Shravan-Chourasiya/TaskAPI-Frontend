@@ -1,39 +1,28 @@
-import { useEffect } from 'react';
-import { createBrowserRouter, RouterProvider, useLocation, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Pricing from './pages/Pricing';
-import Docs from './pages/Docs';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import Features from './pages/Features';
-import { Privacy, Terms, Cookies } from './pages/Legal';
+import Login from './pages/Authentication/Login';
+import Register from './pages/Authentication/Register';
+import Pricing from './pages/Business/Pricing';
+import Checkout from './pages/Business/Checkout';
+import PaymentSuccess from './pages/Business/PaymentSuccess';
+import Docs from './pages/Business/Docs';
+import About from './pages/Utility/About';
+import Contact from './pages/Utility/Contact';
+import Features from './pages/Business/Features';
+import { Privacy, Terms, Cookies } from './pages/Utility/Legal';
+import Notfound from './pages/Utility/Notfound';
+import Dashboard from './pages/Authentication/Dashboard';
+import { ProtectedRoute } from './utils/routesProtection';
 
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
-};
 
 const LayoutWrapper = () => (
   <Layout>
-    <ScrollToTop />
     <Outlet />
   </Layout>
 );
 
-const NotFound = () => (
-  <div className="pt-48 pb-32 text-center px-8">
-    <h1 className="text-9xl font-black font-headline text-slate-200 mb-8">404</h1>
-    <h2 className="text-4xl font-black font-headline mb-8 text-on-surface">System Malfunction.</h2>
-    <p className="text-secondary mb-12 text-lg">The coordinate you're looking for does not exist in our cluster.</p>
-    <a href="/" className="px-10 py-4 bg-primary text-on-primary font-bold rounded-2xl shadow-xl shadow-primary/20 inline-block hover:scale-105 active:scale-95 transition-transform">Return to Origin</a>
-  </div>
-);
 
 const router = createBrowserRouter([
   {
@@ -49,32 +38,29 @@ const router = createBrowserRouter([
       { path: '/privacy', element: <Privacy /> },
       { path: '/terms', element: <Terms /> },
       { path: '/cookies', element: <Cookies /> },
-      { path: '*', element: <NotFound /> },
+      { path: '/pricing', element: <Pricing /> },
+      { path: '/checkout', element: <Checkout /> },
+      { path: '/payment-success', element: <PaymentSuccess /> },
+      { path: '/docs', element: <Docs /> },
+      { path: '*', element: <Notfound /> },
 
       // Protected Routes
       {
-        path: '/pricing',
-        element: (
-          <Pricing />
-
+        path: '/dashboard', element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
         )
-      },
-      {
-        path: '/docs',
-        element: (
-
-          <Docs />
-
-        )
-      },
+      }
     ],
   },
 ]);
 
 export default function App() {
+
   return (
-
-    <RouterProvider router={router} />
-
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 }
