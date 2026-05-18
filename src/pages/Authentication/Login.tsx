@@ -24,6 +24,7 @@ const Login: React.FC = () => {
         { withCredentials: true }
       );
       console.log(user);
+      console.log(res);
       setUser(res.data.data || res.data.user || null);
       navigate('/dashboard');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

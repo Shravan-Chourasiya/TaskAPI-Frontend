@@ -1,10 +1,10 @@
 import { type ReactNode } from 'react';
-import { getCookie } from '../utils/cookies';
 import { AuthContext } from '@/utils/authContext';
+import { useIsVerifiedUser } from '@/hooks/useIsVerifiedUser';
 
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const isAuthenticated = !!getCookie('acToken');
+  const isAuthenticated = useIsVerifiedUser();
 
   return (
     <AuthContext.Provider value={{ isAuthenticated }}>

@@ -52,6 +52,10 @@ const Register: React.FC = () => {
       setIsOtpSent(true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
+      // Check if user is already registered but not verified
+      if (err.response?.data?.isRegisteredButNotVerified) {
+        setIsOtpSent(true);
+      }
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
@@ -72,8 +76,7 @@ const Register: React.FC = () => {
     try {
       await axios.post(
         `${config.SERVER_URL}/api/v1/auth/verify?purpose=ve-em-or`,
-        { otp: normalizedOtp ,
-        },
+        { otp, email },
       );
       setOtpSuccess(true);
       setTimeout(() => navigate('/dashboard'), 2000);
