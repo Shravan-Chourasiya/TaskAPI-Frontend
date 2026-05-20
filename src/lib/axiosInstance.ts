@@ -1,5 +1,6 @@
 import { REFRESH_TIMEOUT_MS, TOKEN_ERROR_STATUSES } from "@/constants";
 import { config } from "@/utils/config";
+import authStore from "@/lib/zustandStore";
 import axios from "axios";
 
 declare module 'axios' {
@@ -92,6 +93,13 @@ apiInstance.interceptors.response.use(
 			return apiInstance(originalRequest);
 		} catch (refreshError) {
 			processQueue(refreshError);
+			
+			// Update Zustand store to log user out
+			authStore.getState().logout();
+			
+			// Redirect to login
+			window.location.href = '/login';
+			
 			return Promise.reject(refreshError);
 		} finally {
 			tokenRefreshInProgress = false;
