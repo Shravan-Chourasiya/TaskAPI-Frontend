@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { apiInstance } from "./axiosInstance";
 
 type User = {
 	email: string;
@@ -11,23 +12,90 @@ type AuthStore = {
 	isAuthenticated: boolean;
 	user: User | null;
 	isLoading: boolean;
-	login: (user: User) => void;
-	logout: () => void;
-	refreshUser: (user: User) => void;
+	login: (email:string,password:string) => Promise<void>;
+	logout: () => Promise<void>;
+	refreshUser: () => Promise<void>;
+    checkAuth: () => Promise<void>;
 	setLoading: (loading: boolean) => void;
+    setUser:(user: User | null) => void;
 	setAuthenticated: (authenticated: boolean) => void;
 };
+
 
 const authStore = create<AuthStore>((set) => ({
 	isAuthenticated: false,
 	user: null,
 	isLoading: false,
-	login: (user: User) => set({ isAuthenticated: true, user, isLoading: false }),
-	logout: () => set({ isAuthenticated: false, user: null, isLoading: false }),
-	refreshUser: (user: User) => set({ user }),
+	
+	login: async (email: string, password: string) => {
+		set({ isLoading: true });
+		try {
+			const response = await apiInstance.post('/api/v1/auth/login', { email, password });
+			if (!response.data || !response.data.data) {
+				throw new Error('Invalid response from server. Failed to Login. Try again later');
+			}
+			set({ isAuthenticated: true, user: response.data.data, isLoading: false });
+		} catch (error) {
+			console.error('Login failed:', error);
+			set({ isAuthenticated: false, user: null, isLoading: false });
+			throw new Error('Login failed. Please check your credentials and try again.');
+		}
+	},
+	
+	logout: async () => {
+		set({ isLoading: true });
+		try {
+			const response = await apiInstance.post('/api/v1/auth/logout');
+			if (response.status !== 200) {
+				console.error('Logout failed with status:', response.status);
+				throw new Error(`Logout failed with status: ${response.status}`);
+			}
+			console.log('Logout successful');
+			set({ isAuthenticated: false, user: null, isLoading: false });
+			window.location.href = '/';
+		} catch (error) {
+			console.error('Logout failed:', error);
+			set({ isLoading: false });
+			throw new Error('Logout failed. Please try again.');
+		}
+	},
+	
+	refreshUser: async () => {
+		set({ isLoading: true });
+		try {
+			const response = await apiInstance.get('/api/v1/user/is-user');
+			if (!response.data || !response.data.user) {
+				throw new Error('Invalid response from server. Failed to refresh user. Try again later');
+			}
+			if(!response.data.isUser) {
+				set({ isAuthenticated: false, user: null, isLoading: false });
+				window.location.href = "/login";
+				return;
+			}
+			set({ user: response.data.user, isLoading: false });
+		} catch (error) {
+			console.error('Failed to refresh user:', error);
+			set({ isAuthenticated: false, user: null, isLoading: false });
+		}
+	},
+	
+	checkAuth: async () => {
+		set({ isLoading: true });
+		try {
+			const response = await apiInstance.get('/api/v1/user/is-user');
+			if (response.status === 200 && response.data && response.data.user) {
+				set({ isAuthenticated: true, user: response.data.user, isLoading: false });
+			} else {
+				set({ isAuthenticated: false, user: null, isLoading: false });
+			}
+		} catch {
+			set({ isAuthenticated: false, user: null, isLoading: false });
+		}
+	},
+	
 	setLoading: (loading: boolean) => set({ isLoading: loading }),
-	setAuthenticated: (authenticated: boolean) =>
-		set({ isAuthenticated: authenticated }),
+	setAuthenticated: (authenticated: boolean) => set({ isAuthenticated: authenticated }),
+	setUser: (user: User | null) => set({ user }),
 }));
 
 export default authStore;

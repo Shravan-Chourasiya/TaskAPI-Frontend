@@ -2,8 +2,7 @@
 import { useState } from 'react';
 import { Key, LogOut, Copy, Eye, EyeOff, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { config } from '@/utils/config';
+import authStore from '@/lib/zustandStore';
 import { Button } from '../ui/button';
 
 interface ProfileSidebarProps {
@@ -15,6 +14,7 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
     const navigate = useNavigate();
     const [showApiKey, setShowApiKey] = useState(false);
     const [copied, setCopied] = useState(false);
+    const store = authStore();
 
     // Mock data - replace with actual user data from context/API
     const userData = {
@@ -32,9 +32,7 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
 
     const handleLogout = async () => {
         try {
-            await axios.delete(`${config.SERVER_URL}/api/v1/auth/logout`, {
-                withCredentials: true
-            });
+         store.logout();
             navigate('/login');
         } catch (error) {
             console.error('Logout failed:', error);
@@ -54,14 +52,14 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
                     }`}
             >
                 <div className="flex flex-col h-full p-6">
-                    <button
+                    <Button
                         onClick={onClose}
                         title="Close sidebar"
                         aria-label="Close sidebar"
                         className="lg:hidden absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-secondary hover:text-on-surface"
                     >
                         <X className="w-5 h-5" />
-                    </button>
+                    </Button>
 
                     {/* Profile Section */}
                     <div className="mb-6">
@@ -100,30 +98,30 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
                                             className="w-full bg-surface-container px-3 py-2 rounded-lg text-xs font-mono text-on-surface pr-20"
                                         />
                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                                            <button
+                                            <Button
                                                 onClick={() => setShowApiKey(!showApiKey)}
                                                 title={showApiKey ? 'Hide API key' : 'Show API key'}
                                                 aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
                                                 className="p-1.5 hover:bg-surface-container-high rounded-md transition-colors"
                                             >
                                                 {showApiKey ? <EyeOff className="w-4 h-4 text-secondary" /> : <Eye className="w-4 h-4 text-secondary" />}
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 onClick={handleCopyApiKey}
                                                 title="Copy API key"
                                                 aria-label="Copy API key to clipboard"
                                                 className="p-1.5 hover:bg-surface-container-high rounded-md transition-colors"
                                             >
                                                 <Copy className={`w-4 h-4 ${copied ? 'text-primary' : 'text-secondary'}`} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                     {copied && <p className="text-xs text-primary mt-1">Copied!</p>}
                                 </div>
 
-                                <button className="w-full text-xs font-bold text-primary hover:bg-primary/10 py-2 rounded-lg transition-colors">
+                                <Button className="w-full text-xs font-bold text-primary hover:bg-primary/10 py-2 rounded-lg transition-colors">
                                     Generate New Key
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
