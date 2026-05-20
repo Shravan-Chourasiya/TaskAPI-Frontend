@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Lock, Mail, User, ArrowRight, Terminal } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface RegisterFormProps {
     username: string;
@@ -60,7 +61,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                                     value={username}
                                     onChange={(e) => onUsernameChange(e.target.value)}
                                     className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors"
-                                    placeholder="johndoe"
+                                    placeholder="Choose a unique username"
                                     required
                                 />
                             </div>
@@ -78,7 +79,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                                     value={email}
                                     onChange={(e) => onEmailChange(e.target.value)}
                                     className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors"
-                                    placeholder="dev@example.com"
+                                    placeholder="your.email@example.com"
                                     required
                                 />
                             </div>
@@ -96,7 +97,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                                     value={password}
                                     onChange={(e) => onPasswordChange(e.target.value)}
                                     className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors"
-                                    placeholder="••••••••"
+                                    placeholder="Create a strong password"
                                     required
                                 />
                             </div>
@@ -105,14 +106,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                             </p>
                         </div>
 
-                        <button
+                        <Button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-primary text-on-primary py-4 rounded-xl font-bold hover:bg-primary-container transition-[background-color,transform] hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                            size="lg"
+                            className="w-full"
                         >
                             {loading ? 'Creating Account...' : 'Create Account'}
                             {!loading && <ArrowRight className="w-4 h-4" />}
-                        </button>
+                        </Button>
                     </form>
 
                     <div className="mt-6 text-center">

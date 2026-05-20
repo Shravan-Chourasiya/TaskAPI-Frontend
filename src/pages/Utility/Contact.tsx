@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Loader2
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Contact: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success'>('idle');
@@ -103,7 +104,7 @@ const Contact: React.FC = () => {
                       value={formData.name}
                       onChange={handleChange}
                       type="text" 
-                      placeholder="John Doe"
+                      placeholder="Enter your full name"
                       className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-[box-shadow] outline-none"
                     />
                   </div>
@@ -115,7 +116,7 @@ const Contact: React.FC = () => {
                       value={formData.email}
                       onChange={handleChange}
                       type="email" 
-                      placeholder="john@company.com"
+                      placeholder="your.email@company.com"
                       className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-[box-shadow] outline-none"
                     />
                   </div>
@@ -127,13 +128,15 @@ const Contact: React.FC = () => {
                       value={formData.message}
                       onChange={handleChange}
                       rows={4}
-                      placeholder="Tell us what you're building..."
+                      placeholder="Describe your project requirements and use case..."
                       className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-[box-shadow] outline-none resize-none"
                     ></textarea>
                   </div>
-                  <button 
+                  <Button 
+                    type="submit"
                     disabled={status === 'sending'}
-                    className="w-full bg-primary text-on-primary p-5 rounded-2xl font-black text-lg hover:bg-primary-container transition-[background-color,box-shadow,transform] hover:scale-[1.01] active:scale-[0.99] shadow-xl flex items-center justify-center gap-3 disabled:opacity-70"
+                    size="lg"
+                    className="w-full text-lg"
                   >
                     {status === 'sending' ? (
                       <>
@@ -146,7 +149,7 @@ const Contact: React.FC = () => {
                         <Send className="w-5 h-5" />
                       </>
                     )}
-                  </button>
+                  </Button>
                 </form>
               </div>
             )}

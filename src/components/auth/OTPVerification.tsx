@@ -1,7 +1,9 @@
-import { ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowRight, RotateCcw, Mail, Lock, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface VerifyFormProps {
+export type OTPPurpose = 'email-verification' | 'password-reset' | 'two-factor-auth';
+
+interface OTPVerificationProps {
     otp: string;
     email: string;
     loading: boolean;
@@ -9,13 +11,44 @@ interface VerifyFormProps {
     otpSuccess: boolean;
     resendCooldown: number;
     otpDailyLimit: number;
+    purpose: OTPPurpose;
     onOtpSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
     onResendOtp: () => void;
     onRevert: () => void;
     onOtpChange: (value: string) => void;
 }
 
-const VerifyForm: React.FC<VerifyFormProps> = ({
+const purposeConfig = {
+    'email-verification': {
+        icon: Mail,
+        title: 'Email Verification',
+        description: 'Enter the 6-digit code sent to',
+        successTitle: 'Email Verified!',
+        successMessage: 'Redirecting to dashboard...',
+        buttonText: 'Verify Email',
+        backText: '← Back to Register'
+    },
+    'password-reset': {
+        icon: Lock,
+        title: 'Reset Password',
+        description: 'Enter the 6-digit code sent to',
+        successTitle: 'Code Verified!',
+        successMessage: 'Redirecting to reset password...',
+        buttonText: 'Verify Code',
+        backText: '← Back to Login'
+    },
+    'two-factor-auth': {
+        icon: ShieldCheck,
+        title: 'Two-Factor Authentication',
+        description: 'Enter the 6-digit code sent to',
+        successTitle: 'Authentication Successful!',
+        successMessage: 'Redirecting to dashboard...',
+        buttonText: 'Verify Code',
+        backText: '← Back to Login'
+    }
+};
+
+const OTPVerification: React.FC<OTPVerificationProps> = ({
     otp,
     email,
     loading,
@@ -23,11 +56,15 @@ const VerifyForm: React.FC<VerifyFormProps> = ({
     otpSuccess,
     resendCooldown,
     otpDailyLimit,
+    purpose,
     onOtpSubmit,
     onResendOtp,
     onRevert,
     onOtpChange,
 }) => {
+    const config = purposeConfig[purpose];
+    const IconComponent = config.icon;
+
     const formatCooldown = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
@@ -41,19 +78,22 @@ const VerifyForm: React.FC<VerifyFormProps> = ({
                     {otpSuccess ? (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <ArrowRight className="w-8 h-8 text-primary" />
+                                <CheckCircle2 className="w-8 h-8 text-primary" />
                             </div>
-                            <h3 className="text-xl font-bold text-on-surface mb-2">Account Verified!</h3>
-                            <p className="text-secondary">Redirecting to dashboard...</p>
+                            <h3 className="text-xl font-bold text-on-surface mb-2">{config.successTitle}</h3>
+                            <p className="text-secondary">{config.successMessage}</p>
                         </div>
                     ) : (
                         <>
                             <div className="text-center mb-6">
-                                <h1 className="text-3xl font-extrabold text-on-surface mb-2">OTP Verification</h1>
+                                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <IconComponent className="w-8 h-8 text-primary" />
+                                </div>
+                                <h1 className="text-3xl font-extrabold text-on-surface mb-2">{config.title}</h1>
                                 <p className="text-secondary text-sm">
-                                    Enter the 6-digit code sent to
+                                    {config.description}
                                 </p>
-                                <p className="text-on-surface font-semibold text-sm break-all">{email}</p>
+                                <p className="text-on-surface font-semibold text-sm break-all mt-1">{email}</p>
                             </div>
 
                             {error && (
@@ -87,7 +127,7 @@ const VerifyForm: React.FC<VerifyFormProps> = ({
                                     size="lg"
                                     className="w-full"
                                 >
-                                    {loading ? 'Verifying...' : 'Verify OTP'}
+                                    {loading ? 'Verifying...' : config.buttonText}
                                     {!loading && <ArrowRight className="w-4 h-4" />}
                                 </Button>
                             </form>
@@ -117,7 +157,7 @@ const VerifyForm: React.FC<VerifyFormProps> = ({
                         onClick={onRevert}
                         className="text-secondary hover:text-on-surface"
                     >
-                        ← Back to Register
+                        {config.backText}
                     </Button>
                 </div>
             </div>
@@ -125,4 +165,4 @@ const VerifyForm: React.FC<VerifyFormProps> = ({
     );
 };
 
-export default VerifyForm;
+export default OTPVerification;

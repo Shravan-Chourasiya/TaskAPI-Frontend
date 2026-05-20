@@ -6,10 +6,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const store = authStore();
 
   useEffect(() => {
-    const store = authStore.getState();
-    store.setLoading(true);
-    store.checkAuth();
-    store.setLoading(false);
+    authStore.getState().checkAuth();
   }, [])
 
 

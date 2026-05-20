@@ -4,6 +4,7 @@ import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
 import Login from './pages/Authentication/Login';
 import Register from './pages/Authentication/Register';
+import ForgotPassword from './pages/Authentication/ForgotPassword';
 import Pricing from './pages/Business/Pricing';
 import Checkout from './pages/Business/Checkout';
 import PaymentSuccess from './pages/Business/PaymentSuccess';
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
       { path: '/', element: <Home /> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
+      { path: '/forgot-password', element: <ForgotPassword /> },
       { path: '/features', element: <Features /> },
       { path: '/about', element: <About /> },
       { path: '/contact', element: <Contact /> },

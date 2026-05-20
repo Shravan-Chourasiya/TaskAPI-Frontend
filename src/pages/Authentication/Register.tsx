@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { config } from '@/utils/config';
 import RegisterForm from '../../components/auth/RegisterForm';
-import VerifyForm from '../../components/auth/VerifyForm';
+import OTPVerification from '../../components/auth/OTPVerification';
 import { OTP_LENGTH } from '../../constants';
 
 const Register: React.FC = () => {
@@ -108,7 +108,7 @@ const Register: React.FC = () => {
 
   return (
     isOtpSent ? (
-      <VerifyForm
+      <OTPVerification
         otp={otp}
         email={email}
         loading={loading}
@@ -116,6 +116,7 @@ const Register: React.FC = () => {
         otpSuccess={otpSuccess}
         resendCooldown={resendCooldown}
         otpDailyLimit={config.OTP_DAILY_LIMIT}
+        purpose="email-verification"
         onOtpSubmit={handleOtpSubmit}
         onResendOtp={handleResendOtp}
         onRevert={handleRevert}

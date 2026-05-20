@@ -54,9 +54,11 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
                 <div className="flex flex-col h-full p-6">
                     <Button
                         onClick={onClose}
+                        variant="ghost"
+                        size="icon"
                         title="Close sidebar"
                         aria-label="Close sidebar"
-                        className="lg:hidden absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-secondary hover:text-on-surface"
+                        className="lg:hidden absolute top-4 right-4"
                     >
                         <X className="w-5 h-5" />
                     </Button>
@@ -100,26 +102,33 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                                             <Button
                                                 onClick={() => setShowApiKey(!showApiKey)}
+                                                variant="ghost"
+                                                size="icon"
                                                 title={showApiKey ? 'Hide API key' : 'Show API key'}
                                                 aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
-                                                className="p-1.5 hover:bg-surface-container-high rounded-md transition-colors"
+                                                className="h-7 w-7"
                                             >
-                                                {showApiKey ? <EyeOff className="w-4 h-4 text-secondary" /> : <Eye className="w-4 h-4 text-secondary" />}
+                                                {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                             </Button>
                                             <Button
                                                 onClick={handleCopyApiKey}
+                                                variant="ghost"
+                                                size="icon"
                                                 title="Copy API key"
                                                 aria-label="Copy API key to clipboard"
-                                                className="p-1.5 hover:bg-surface-container-high rounded-md transition-colors"
+                                                className="h-7 w-7"
                                             >
-                                                <Copy className={`w-4 h-4 ${copied ? 'text-primary' : 'text-secondary'}`} />
+                                                <Copy className={`w-4 h-4 ${copied ? 'text-primary' : ''}`} />
                                             </Button>
                                         </div>
                                     </div>
                                     {copied && <p className="text-xs text-primary mt-1">Copied!</p>}
                                 </div>
 
-                                <Button className="w-full text-xs font-bold text-primary hover:bg-primary/10 py-2 rounded-lg transition-colors">
+                                <Button
+                                    variant="ghost"
+                                    className="w-full text-primary hover:bg-primary/10"
+                                >
                                     Generate New Key
                                 </Button>
                             </div>

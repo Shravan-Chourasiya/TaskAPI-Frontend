@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, Terminal } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -55,16 +56,21 @@ const Login: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors"
-                  placeholder="dev@example.com"
+                  placeholder="your.email@example.com"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-bold text-on-surface">
-                Password
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-sm font-bold text-on-surface">
+                  Password
+                </label>
+                <Link to="/forgot-password" className="text-xs text-primary font-bold hover:underline">
+                  Forgot Password?
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
                 <input
@@ -73,20 +79,21 @@ const Login: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   required
                 />
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={auth.isLoading}
-              className="w-full bg-primary text-on-primary py-4 rounded-xl font-bold hover:bg-primary-container transition-[background-color,transform] hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              size="lg"
+              className="w-full"
             >
               {auth.isLoading ? 'Signing in...' : 'Sign In'}
               {!auth.isLoading && <ArrowRight className="w-4 h-4" />}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-6 text-center">
