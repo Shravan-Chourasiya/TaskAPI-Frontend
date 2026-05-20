@@ -35,6 +35,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Login failed:', error);
+      setIsAuthenticated(false);
+      setUser(null);
+      setIsLoading(false);
+      throw new Error('Login failed. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -53,6 +57,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
     } catch (error) {
       console.error('Logout failed:', error);
+      setIsLoading(false);
+      throw new Error('Login failed. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }

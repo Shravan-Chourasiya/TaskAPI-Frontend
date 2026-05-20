@@ -1,17 +1,13 @@
 import { NavLink } from 'react-router-dom';
 import { LogOut, LayoutDashboard } from 'lucide-react';
-import axios from 'axios';
-import { config } from '../../utils/config';
 import { Button } from '../ui/button';
 import { useAuth } from '@/hooks/useAuth';
 
 const Navbar = () => {
-    const { isAuthenticated } = useAuth();
+    const auth = useAuth();
     const handleLogout = async () => {
         try {
-            await axios.delete(`${config.SERVER_URL}/api/v1/auth/logout`, {
-                withCredentials: true
-            });
+          auth.logout();
         } catch (error) {
             console.error('Logout failed:', error);
         }
@@ -39,7 +35,7 @@ const Navbar = () => {
                 </nav>
 
                 <div className="flex items-center gap-3">
-                    {isAuthenticated ? (
+                    {auth.isAuthenticated ? (
                         <>
                             <NavLink
                                 to='/dashboard'

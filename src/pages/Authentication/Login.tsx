@@ -1,40 +1,24 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, Terminal } from 'lucide-react';
-import axios from 'axios';
-import { config } from '@/utils/config';
+import { useAuth } from '@/hooks/useAuth';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const [user,setUser] = useState(null);
+  const auth = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const res = await axios.post(
-        `${config.SERVER_URL}/api/v1/auth/login`,
-        { email, password },
-        { withCredentials: true }
-      );
-      console.log(user);
-      console.log(res);
-      setUser(res.data.data || res.data.user || null);
+    setError(null);
+    auth.login(email, password).then(() => {
       navigate('/dashboard');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+    }).catch((error: Error) => {
+      setError(error.message);
+    });
+  }
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
@@ -97,11 +81,11 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={auth.isLoading}
               className="w-full bg-primary text-on-primary py-4 rounded-xl font-bold hover:bg-primary-container transition-[background-color,transform] hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
-              {!loading && <ArrowRight className="w-4 h-4" />}
+              {auth.isLoading ? 'Signing in...' : 'Sign In'}
+              {!auth.isLoading && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
 

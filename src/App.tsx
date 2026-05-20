@@ -15,8 +15,7 @@ import { Privacy, Terms, Cookies } from './pages/Utility/Legal';
 import Notfound from './pages/Utility/Notfound';
 import Dashboard from './pages/Authentication/Dashboard';
 import { ProtectedRoute } from './utils/routesProtection';
-import Logout from './pages/Authentication/Logout';
-import { useSilentTokenRenew } from './hooks/useSilentTokenRenew';
+
 
 
 const LayoutWrapper = () => (
@@ -24,9 +23,6 @@ const LayoutWrapper = () => (
     <Outlet />
   </Layout>
 );
-
-const accessToken = localStorage.getItem("accessToken");
-const refreshToken = localStorage.getItem("refreshToken");
 
 
 const router = createBrowserRouter([
@@ -47,7 +43,6 @@ const router = createBrowserRouter([
       { path: '/checkout', element: <Checkout /> },
       { path: '/payment-success', element: <PaymentSuccess /> },
       { path: '/docs', element: <Docs /> },
-      { path: '/logout', element: <Logout /> },
       { path: '*', element: <Notfound /> },
 
 
@@ -63,9 +58,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-export default function App() {
-  useSilentTokenRenew(String(accessToken),String(refreshToken));
-  
+export default function App() {  
   return (
     <AuthProvider>
       <RouterProvider router={router} />

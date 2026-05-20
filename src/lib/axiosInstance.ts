@@ -35,7 +35,7 @@ const refreshToken = (): Promise<void> => {
 	let timeoutId: ReturnType<typeof setTimeout>;
 	
 	const refresh = apiInstance
-		.post("api/v1/auth/token/refresh")
+		.post("/api/v1/auth/token/refresh")
 		.then(() => {
 			clearTimeout(timeoutId);
 			return void 0;
