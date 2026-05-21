@@ -1,12 +1,16 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, type ReactNode, useRef } from 'react';
 import { AuthContext } from '@/utils/authContext';
 import authStore from '@/lib/zustandStore';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const store = authStore();
+  const hasCheckedAuth = useRef(false);
 
   useEffect(() => {
-    authStore.getState().checkAuth();
+    if (!hasCheckedAuth.current) {
+      hasCheckedAuth.current = true;
+      authStore.getState().checkAuth();
+    }
   }, [])
 
 

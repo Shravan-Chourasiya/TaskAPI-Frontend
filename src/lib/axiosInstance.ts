@@ -94,11 +94,9 @@ apiInstance.interceptors.response.use(
 		} catch (refreshError) {
 			processQueue(refreshError);
 			
-			// Update Zustand store to log user out
-			authStore.getState().logout();
-			
-			// Redirect to login
-			window.location.href = '/login';
+			// Update Zustand store to log user out (without redirect)
+			authStore.getState().setAuthenticated(false);
+			authStore.getState().setUser(null);
 			
 			return Promise.reject(refreshError);
 		} finally {

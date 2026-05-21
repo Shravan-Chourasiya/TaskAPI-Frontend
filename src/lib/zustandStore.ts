@@ -69,7 +69,6 @@ const authStore = create<AuthStore>((set) => ({
 			}
 			if(!response.data.isUser) {
 				set({ isAuthenticated: false, user: null, isLoading: false });
-				window.location.href = "/login";
 				return;
 			}
 			set({ user: response.data.user, isLoading: false });

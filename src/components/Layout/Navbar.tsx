@@ -46,7 +46,8 @@ const Navbar = () => {
                             </NavLink>
                             <Button
                                 onClick={handleLogout}
-                                className="bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full px-6 py-2 text-sm font-bold transition-colors flex items-center gap-2"
+                                variant="secondary"
+                                className="flex items-center gap-2"
                             >
                                 <LogOut className="w-4 h-4" />
                                 Logout
