@@ -3,14 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, ArrowRight, Terminal, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import OTPVerification from '@/components/auth/OTPVerification';
-import axios, {type AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import { config } from '@/utils/config';
+import { apiInstance } from '@/lib/axiosInstance';
 
 type Step = 'email' | 'otp' | 'reset';
 
 const ForgotPassword: React.FC = () => {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
+  const [id, setID] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -44,7 +46,13 @@ const ForgotPassword: React.FC = () => {
     setError('');
 
     try {
-      await axios.post(`${config.SERVER_URL}/api/v1/auth/forgot-password`, { email });
+      const response = await apiInstance.post("/api/v1/auth/forgot-password/init", { email });
+      if (!response.data.data) {
+        setError(response.data.message || 'Failed to send reset code. Please try again.');
+        setLoading(false);
+        return;
+      }
+      setEmail(response.data.data.email);
       setStep('otp');
     } catch (err: unknown) {
       const error = err as AxiosError<{ message?: string }>;
@@ -66,12 +74,19 @@ const ForgotPassword: React.FC = () => {
     setError('');
 
     try {
-      await axios.post(`${config.SERVER_URL}/api/v1/auth/verify-reset-otp`, { otp, email });
+      const response = await apiInstance.post(`${config.SERVER_URL}/api/v1/auth/verify?purpose=fr-pa`, { otp, email });
+      if (!response.data.data) {
+        setError(response.data.message || 'Invalid or expired code. Please try again.');
+        setLoading(false);
+        return;
+      }
+      setID(response.data.data.userId);
+      setEmail(response.data.data.userEmail);
       setOtpSuccess(true);
       setTimeout(() => {
         setOtpSuccess(false);
         setStep('reset');
-      }, 1500);
+      }, 1000);
     } catch (err: unknown) {
       const error = err as AxiosError<{ message?: string }>;
       setError(error.response?.data?.message || 'Invalid or expired code. Please try again.');
@@ -91,11 +106,17 @@ const ForgotPassword: React.FC = () => {
     setError('');
 
     try {
-      await axios.post(`${config.SERVER_URL}/api/v1/auth/reset-password`, { 
-        email, 
-        otp, 
-        newPassword 
+      const response = await apiInstance.post(`${config.SERVER_URL}/api/v1/auth/forgot-password/update`, {
+        userId: id,
+        userEmail: email,
+        newPassword
       });
+
+      if (!response.data.success) {
+        setError(response.data.message || 'Failed to reset password. Please try again.');
+        setLoading(false);
+        return;
+      }
       navigate('/login');
     } catch (err: unknown) {
       const error = err as AxiosError<{ message?: string }>;
@@ -108,7 +129,7 @@ const ForgotPassword: React.FC = () => {
   const handleResendOtp = async () => {
     setError('');
     try {
-      await axios.post(`${config.SERVER_URL}/api/v1/auth/forgot-password`, { email });
+      await apiInstance.post(`${config.SERVER_URL}/api/v1/auth/resend-otp`, { email });
       setResendCooldown(config.OTP_RESEND_COOLDOWN_SECONDS);
     } catch (err: unknown) {
       const error = err as AxiosError<{ message?: string }>;
@@ -166,10 +187,9 @@ const ForgotPassword: React.FC = () => {
                   {error}
                 </div>
               )}
-
               <div className="space-y-2">
                 <label htmlFor="newPassword" className="block text-sm font-bold text-on-surface">
-                  New Password
+                  Enter New Password
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
@@ -187,7 +207,7 @@ const ForgotPassword: React.FC = () => {
 
               <div className="space-y-2">
                 <label htmlFor="confirmPassword" className="block text-sm font-bold text-on-surface">
-                  Confirm Password
+                  Confirm Your New Password
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
