@@ -6,6 +6,14 @@ type User = {
 	username: string;
 	status: string;
 	role: string[];
+	profile?: {
+		firstName?: string;
+		lastName?: string;
+		bio?: string;
+		avatarUrl?: string;
+		country?: string;
+		city?: string;
+	};
 };
 
 type AuthStore = {

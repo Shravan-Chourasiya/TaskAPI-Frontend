@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import Login from './pages/Authentication/Login';
 import Register from './pages/Authentication/Register';
 import ForgotPassword from './pages/Authentication/ForgotPassword';
+import Profile from './pages/Authentication/Profile';
+import ProfileForm from './pages/Authentication/ProfileForm';
 import Pricing from './pages/Business/Pricing';
 import Checkout from './pages/Business/Checkout';
 import PaymentSuccess from './pages/Business/PaymentSuccess';
@@ -16,6 +18,7 @@ import { Privacy, Terms, Cookies } from './pages/Utility/Legal';
 import Notfound from './pages/Utility/Notfound';
 import Dashboard from './pages/Authentication/Dashboard';
 import { ProtectedRoute } from './utils/routesProtection';
+import ProfileForm from './pages/Authentication/ProfileForm';
 
 
 
@@ -53,6 +56,27 @@ const router = createBrowserRouter([
         path: '/dashboard', element: (
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/profile', element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/profile/edit', element: (
+          <ProtectedRoute>
+            <ProfileForm />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/profile', element: (
+          <ProtectedRoute>
+            <ProfileForm />
           </ProtectedRoute>
         )
       }
