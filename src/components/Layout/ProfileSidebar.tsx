@@ -1,6 +1,6 @@
 // Frontend/src/components/Layout/ProfileSidebar.tsx
 import { useState } from 'react';
-import { Key, LogOut, Copy, Eye, EyeOff, X } from 'lucide-react';
+import { Key, LogOut, Copy, Eye, EyeOff, X, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authStore from '@/lib/zustandStore';
 import { Button } from '../ui/button';
@@ -15,17 +15,19 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
     const [showApiKey, setShowApiKey] = useState(false);
     const [copied, setCopied] = useState(false);
     const store = authStore();
+    const user = store.user;
 
-    // Mock data - replace with actual user data from context/API
-    const userData = {
-        username: 'developer',
-        email: 'dev@example.com',
-        profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=developer',
-        apiKey: 'tk_live_492x82abc123def456'
-    };
+    // Fallback avatar if no profile avatar
+    const avatarUrl = user?.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username || 'default'}`;
+    const displayName = user?.profile?.firstName && user?.profile?.lastName 
+        ? `${user.profile.firstName} ${user.profile.lastName}`
+        : user?.username || 'User';
+
+    // Mock API key - replace with actual API key from backend
+    const apiKey = 'tk_live_492x82abc123def456';
 
     const handleCopyApiKey = () => {
-        navigator.clipboard.writeText(userData.apiKey);
+        navigator.clipboard.writeText(apiKey);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -65,17 +67,25 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
 
                     {/* Profile Section */}
                     <div className="mb-6">
-                        <div className="flex items-center gap-4 mb-2">
+                        <div className="flex items-center gap-4 mb-4">
                             <div className="w-16 h-16 rounded-full overflow-hidden bg-surface-container shadow-ambient">
-                                <img src={userData.profilePic} alt={userData.username} className="w-full h-full object-cover" />
+                                <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1">
-                                <h2 className="text-lg font-bold text-on-surface">{userData.username}</h2>
-                                <p className="text-sm text-secondary truncate">{userData.email}</p>
+                                <h2 className="text-lg font-bold text-on-surface">{displayName}</h2>
+                                <p className="text-sm text-secondary truncate">{user?.email}</p>
                             </div>
                         </div>
+                        <Button
+                            onClick={() => navigate('/profile')}
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                        >
+                            <Edit className="w-4 h-4" />
+                            Edit Profile
+                        </Button>
                     </div>
-
                     {/* API Keys Section */}
                     <div className="flex-1 mb-6">
                         <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-ambient">
@@ -93,7 +103,7 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
                                         <input
                                             id="api-key-input"
                                             type={showApiKey ? 'text' : 'password'}
-                                            value={userData.apiKey}
+                                            value={apiKey}
                                             readOnly
                                             title="API Key"
                                             aria-label="Production API Key"

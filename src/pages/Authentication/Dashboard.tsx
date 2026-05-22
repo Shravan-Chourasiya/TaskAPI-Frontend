@@ -3,6 +3,7 @@ import { useState } from 'react';
 import ProfileSidebar from '../../components/Layout/ProfileSidebar.jsx';
 import DashboardStats from '../../components/Layout/DashboardStats.jsx';
 import { Activity, Key, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button.js';
 
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -68,14 +69,14 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <button
+      <Button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         title="Open profile sidebar"
         aria-label="Open profile sidebar"
         className="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-ambient-hover flex items-center justify-center z-40"
       >
         <Users className="w-6 h-6" />
-      </button>
+      </Button>
     </div>
   );
 };
