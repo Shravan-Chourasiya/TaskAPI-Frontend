@@ -1,24 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, MapPin, FileText, Upload, Link as LinkIcon, Save, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiInstance } from '@/lib/axiosInstance';
+import authStore from '@/lib/zustandStore';
 
 type AvatarType = 'upload' | 'url';
 type MessageType = 'success' | 'error' | null;
 
 const ProfileForm = () => {
-  const [firstName, setFirstName] = useState('John');
-  const [lastName, setLastName] = useState('Doe');
-  const [bio, setBio] = useState('Full-stack developer passionate about building scalable applications.');
-  const [country, setCountry] = useState('United States');
-  const [city, setCity] = useState('San Francisco');
+  const store = authStore();
+  const user = store.user;
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [bio, setBio] = useState('');
+  const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
   const [avatarType, setAvatarType] = useState<AvatarType>('url');
-  const [avatarUrl, setAvatarUrl] = useState('https://api.dicebear.com/7.x/avataaars/svg?seed=John');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string>('');
   const [messageType, setMessageType] = useState<MessageType>(null);
+
+  useEffect(() => {
+    if (user?.profile) {
+      setFirstName(user.profile.firstName || '');
+      setLastName(user.profile.lastName || '');
+      setBio(user.profile.bio || '');
+      setCountry(user.profile.country || '');
+      setCity(user.profile.city || '');
+      setAvatarUrl(user.profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`);
+    }
+  }, [user]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -324,12 +339,21 @@ const ProfileForm = () => {
                 variant="outline"
                 size="lg"
                 onClick={() => {
-                  setFirstName('John');
-                  setLastName('Doe');
-                  setBio('Full-stack developer passionate about building scalable applications.');
-                  setCountry('United States');
-                  setCity('San Francisco');
-                  setAvatarUrl('https://api.dicebear.com/7.x/avataaars/svg?seed=John');
+                  if (user?.profile) {
+                    setFirstName(user.profile.firstName || '');
+                    setLastName(user.profile.lastName || '');
+                    setBio(user.profile.bio || '');
+                    setCountry(user.profile.country || '');
+                    setCity(user.profile.city || '');
+                    setAvatarUrl(user.profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`);
+                  } else {
+                    setFirstName('');
+                    setLastName('');
+                    setBio('');
+                    setCountry('');
+                    setCity('');
+                    setAvatarUrl('');
+                  }
                   setAvatarFile(null);
                   setAvatarPreview('');
                   setMessage('');

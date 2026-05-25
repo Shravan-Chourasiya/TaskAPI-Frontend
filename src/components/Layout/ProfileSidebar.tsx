@@ -1,19 +1,15 @@
 // Frontend/src/components/Layout/ProfileSidebar.tsx
 import { useState } from 'react';
-import { Key, LogOut, Copy, Eye, EyeOff, X, Edit } from 'lucide-react';
+import { Key, LogOut, Copy, Eye, EyeOff, Settings, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authStore from '@/lib/zustandStore';
 import { Button } from '../ui/button';
 
-interface ProfileSidebarProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
-
-const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
+const ProfileSidebar = () => {
     const navigate = useNavigate();
     const [showApiKey, setShowApiKey] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const store = authStore();
     const user = store.user;
 
@@ -43,37 +39,44 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
 
     return (
         <>
+            <Button
+                onClick={() => setIsOpen(!isOpen)}
+                variant="ghost"
+                size="icon"
+                className="fixed top-4 right-4 z-50"
+            >
+                <Settings className="w-5 h-5" />
+            </Button>
+
             <div
-                className={`fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-40 lg:hidden transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                className={`fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-40 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     }`}
-                onClick={onClose}
+                onClick={() => setIsOpen(false)}
             />
 
             <aside
-                className={`fixed top-0 left-0 h-full w-80 bg-surface-container-low border-r border-outline-variant/20 z-50 transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+                className={`fixed top-0 right-0 h-full w-80 bg-surface-container-low border-l border-outline-variant/20 z-50 transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'
                     }`}
             >
                 <div className="flex flex-col h-full p-6">
                     <Button
-                        onClick={onClose}
+                        onClick={() => setIsOpen(false)}
                         variant="ghost"
                         size="icon"
-                        title="Close sidebar"
-                        aria-label="Close sidebar"
-                        className="lg:hidden absolute top-4 right-4"
+                        className="absolute top-4 right-4"
                     >
-                        <X className="w-5 h-5" />
+                        <Settings className="w-5 h-5" />
                     </Button>
 
                     {/* Profile Section */}
                     <div className="mb-6">
                         <div className="flex items-center gap-4 mb-4">
-                            <div className="w-16 h-16 rounded-full overflow-hidden bg-surface-container shadow-ambient">
+                            <div className="w-16 h-16 rounded-full overflow-hidden bg-surface-container shadow-ambient flex-shrink-0">
                                 <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
                             </div>
-                            <div className="flex-1">
-                                <h2 className="text-lg font-bold text-on-surface">{displayName}</h2>
-                                <p className="text-sm text-secondary truncate">{user?.email}</p>
+                            <div className="flex-1 min-w-0">
+                                <h2 className="text-lg font-bold text-on-surface truncate">{displayName}</h2>
+                                <p className="text-sm text-secondary truncate">@{user?.username}</p>
                             </div>
                         </div>
                         <Button

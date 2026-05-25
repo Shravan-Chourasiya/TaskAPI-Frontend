@@ -18,7 +18,7 @@ import { Privacy, Terms, Cookies } from './pages/Utility/Legal';
 import Notfound from './pages/Utility/Notfound';
 import Dashboard from './pages/Authentication/Dashboard';
 import { ProtectedRoute } from './utils/routesProtection';
-import ProfileForm from './pages/Authentication/ProfileForm';
+import { PublicRoute } from './utils/PublicRoute';
 
 
 
@@ -33,11 +33,13 @@ const router = createBrowserRouter([
   {
     element: <LayoutWrapper />,
     children: [
+      // Public Routes (redirect to dashboard if authenticated)
+      { path: '/', element: <PublicRoute><Home /></PublicRoute> },
+      { path: '/login', element: <PublicRoute><Login /></PublicRoute> },
+      { path: '/register', element: <PublicRoute><Register /></PublicRoute> },
+      { path: '/forgot-password', element: <PublicRoute><ForgotPassword /></PublicRoute> },
+      
       // Unprotected Routes
-      { path: '/', element: <Home /> },
-      { path: '/login', element: <Login /> },
-      { path: '/register', element: <Register /> },
-      { path: '/forgot-password', element: <ForgotPassword /> },
       { path: '/features', element: <Features /> },
       { path: '/about', element: <About /> },
       { path: '/contact', element: <Contact /> },
@@ -68,13 +70,6 @@ const router = createBrowserRouter([
       },
       {
         path: '/profile/edit', element: (
-          <ProtectedRoute>
-            <ProfileForm />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: '/profile', element: (
           <ProtectedRoute>
             <ProfileForm />
           </ProtectedRoute>
