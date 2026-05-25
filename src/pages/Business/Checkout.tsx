@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { apiInstance } from '@/lib/axiosInstance';
 import { usePlanStore } from '@/lib/planStore';
+import { toast } from 'sonner';
 
 declare global {
   interface Window {
@@ -51,6 +52,7 @@ const Checkout = () => {
 
   const handlePayment = async () => {
     if (!isAuthenticated) {
+      toast.error('Please login to continue with payment');
       navigate('/login');
       return;
     }
@@ -61,6 +63,7 @@ const Checkout = () => {
         const subscriptionPlanDetails = { planName: planDetails.name.trim(), autoRenewStatus: false, duration: 12, price: 0 };
 
         await apiInstance.post('/api/v1/subscription/buy-plan', { subscriptionPlanDetails });
+        toast.success('Successfully subscribed to Free plan!');
         navigate('/payment-success', {
           state: {
             plan: planDetails.name,
@@ -73,7 +76,7 @@ const Checkout = () => {
 
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        alert('Failed to load payment gateway. Please try again.');
+        toast.error('Failed to load payment gateway. Please try again.');
         setLoading(false);
         return;
       }
@@ -106,6 +109,7 @@ const Checkout = () => {
               plan: planDetails.name
             });
 
+            toast.success('Payment successful! Subscription activated.');
             navigate('/payment-success', {
               state: {
                 plan: planDetails.name,
@@ -114,7 +118,7 @@ const Checkout = () => {
             });
           } catch (error) {
             console.error('Payment verification failed:', error);
-            alert('Payment verification failed. Please contact support.');
+            toast.error('Payment verification failed. Please contact support.');
           }
         },
         prefill: {
@@ -127,6 +131,7 @@ const Checkout = () => {
         },
         modal: {
           ondismiss: function () {
+            toast.warning('Payment cancelled');
             setLoading(false);
           }
         }
@@ -137,7 +142,7 @@ const Checkout = () => {
       setLoading(false);
     } catch (error) {
       console.error('Payment error:', error);
-      alert('Failed to initiate payment. Please try again.');
+      toast.error((error as any).response?.data?.message || 'Failed to initiate payment. Please try again.');
       setLoading(false);
     }
   };

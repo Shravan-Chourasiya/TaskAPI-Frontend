@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { User, MapPin, FileText, Upload, Link as LinkIcon, Save, X, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { User, MapPin, FileText, Upload, Link as LinkIcon, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiInstance } from '@/lib/axiosInstance';
 import authStore from '@/lib/zustandStore';
+import { toast } from 'sonner';
 
 type AvatarType = 'upload' | 'url';
-type MessageType = 'success' | 'error' | null;
 
 const ProfileForm = () => {
   const store = authStore();
@@ -21,8 +21,6 @@ const ProfileForm = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string>('');
-  const [messageType, setMessageType] = useState<MessageType>(null);
 
   useEffect(() => {
     if (user?.profile) {
@@ -55,11 +53,8 @@ const ProfileForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
-    setMessageType(null);
 
     try {
-      // Create FormData for multipart/form-data
       const formData = new FormData();
       formData.append('firstName', firstName);
       formData.append('lastName', lastName);
@@ -67,7 +62,6 @@ const ProfileForm = () => {
       formData.append('country', country);
       formData.append('city', city);
       
-      // Add avatar based on type
       if (avatarType === 'upload' && avatarFile) {
         formData.append('avatar', avatarFile);
       } else if (avatarType === 'url' && avatarUrl) {
@@ -77,23 +71,12 @@ const ProfileForm = () => {
       }
 
       const response = await apiInstance.patch('/api/v1/auth/profile/update', formData);
-        
-      // Display success message from backend
-      setMessage(response.data?.message || 'Profile updated successfully!');
-      setMessageType('success');  
+      toast.success(response.data?.message || 'Profile updated successfully!');
     } catch (error: unknown) {
-      // Display error message from backend
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setMessage((error as any).response?.data?.message || 'Failed to update profile. Please try again.');
-      setMessageType('error');
+      toast.error((error as any).response?.data?.message || 'Failed to update profile. Please try again.');
       console.error('Error updating profile:', error);
     } finally {
       setLoading(false);
-      // Auto-hide message after 5 seconds
-      setTimeout(() => {
-        setMessage('');
-        setMessageType(null);
-      }, 5000);
     }
   };
 
@@ -307,22 +290,6 @@ const ProfileForm = () => {
               </div>
             </div>
 
-            {/* Message Display */}
-            {message && (
-              <div className={`px-4 py-3 rounded-xl text-sm flex items-center gap-2 ${
-                messageType === 'success' 
-                  ? 'bg-primary/10 border border-primary/20 text-primary'
-                  : 'bg-error/10 border border-error/20 text-error'
-              }`}>
-                {messageType === 'success' ? (
-                  <CheckCircle2 className="w-4 h-4" />
-                ) : (
-                  <AlertCircle className="w-4 h-4" />
-                )}
-                {message}
-              </div>
-            )}
-
             {/* Submit Button */}
             <div className="flex gap-4 pt-4">
               <Button
@@ -356,8 +323,6 @@ const ProfileForm = () => {
                   }
                   setAvatarFile(null);
                   setAvatarPreview('');
-                  setMessage('');
-                  setMessageType(null);
                 }}
               >
                 Reset

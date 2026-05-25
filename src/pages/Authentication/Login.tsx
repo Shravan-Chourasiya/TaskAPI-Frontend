@@ -3,21 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, Terminal } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const auth = useAuth();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     auth.login(email, password).then(() => {
+      toast.success('Login successful!');
       navigate('/dashboard');
     }).catch((error: Error) => {
-      setError(error.message);
+      toast.error(error.message || 'Login failed. Please try again.');
     });
   }
   return (
@@ -38,11 +38,6 @@ const Login: React.FC = () => {
 
         <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient">
           <form onSubmit={handleLogin} className="space-y-6">
-            {error && (
-              <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl text-sm">
-                {error}
-              </div>
-            )}
 
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-bold text-on-surface">
