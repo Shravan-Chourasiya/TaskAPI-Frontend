@@ -14,6 +14,12 @@ const PaymentSuccess = () => {
     }
   }, [plan, amount, navigate]);
 
+  const getBillingDate = () => {
+    const nextBillingDate = new Date();
+    nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+    return nextBillingDate.toLocaleDateString();
+  };
+
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center px-6 py-12">
       <div className="max-w-2xl w-full">
@@ -48,7 +54,7 @@ const PaymentSuccess = () => {
             <div className="flex justify-between items-center">
               <span className="text-secondary">Next Billing Date</span>
               <span className="font-bold text-on-surface">
-                {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                {getBillingDate()}
               </span>
             </div>
           </div>

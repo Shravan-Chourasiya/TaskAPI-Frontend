@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { CreditCard, Shield, Lock, ArrowLeft } from 'lucide-react';
-import axios from 'axios';
-import { config } from '@/utils/config';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { apiInstance } from '@/lib/axiosInstance';
+import { usePlanStore } from '@/lib/planStore';
 
 declare global {
   interface Window {
@@ -20,12 +20,11 @@ interface PlanDetails {
 }
 
 const Checkout = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const selectedPlan = usePlanStore((state) => state.selectedPlan);
 
-  // Get plan details from navigation state or default to Basic
-  const planDetails: PlanDetails = location.state?.plan || {
+  const planDetails: PlanDetails = selectedPlan || {
     name: 'Basic',
     price: 5,
     features: [
@@ -51,32 +50,27 @@ const Checkout = () => {
   const { isAuthenticated } = useAuth();
 
   const handlePayment = async () => {
-    // Check authentication first
     if (!isAuthenticated) {
-      navigate('/login', { state: { from: '/checkout', plan: planDetails } });
+      navigate('/login');
       return;
     }
 
     setLoading(true);
     try {
-      // Handle free plan
-      if (planDetails.name === 'Free') {
-        await axios.post(
-          `${config.SERVER_URL}/api/v1/subscription/buy-plan`,
-          { subscriptionPlanDetails: planDetails },
-          { withCredentials: true }
-        );
-        navigate('/payment-success', { 
-          state: { 
+      if (planDetails.name === 'Free ') {
+        const subscriptionPlanDetails = { planName: planDetails.name.trim(), autoRenewStatus: false, duration: 12, price: 0 };
+
+        await apiInstance.post('/api/v1/subscription/buy-plan', { subscriptionPlanDetails });
+        navigate('/payment-success', {
+          state: {
             plan: planDetails.name,
-            amount: planDetails.price 
-          } 
+            amount: planDetails.price
+          }
         });
         setLoading(false);
         return;
       }
 
-      // Load Razorpay script
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         alert('Failed to load payment gateway. Please try again.');
@@ -84,43 +78,34 @@ const Checkout = () => {
         return;
       }
 
-      // Create order on backend
-      const { data: order } = await axios.post(
-        `${config.SERVER_URL}/api/v1/payment/create-order`,
-        {
-          amount: planDetails.price * 100, // Convert to paise
-          currency: 'INR',
-          receipt: `receipt_${Date.now()}`,
-          notes: {
-            plan: planDetails.name
-          }
-        },
-        { withCredentials: true }
-      );
+      const subscriptionPlanDetails = {
+        amount: planDetails.price * 100,
+        currency: 'INR',
+        receipt: `receipt_${Date.now()}`,
+        plan: planDetails
+      };
 
-      // Razorpay options
+      const { data } = await apiInstance.post('/api/v1/subscription/buy-plan', { subscriptionPlanDetails });
+      if (!data) {
+        throw new Error('Failed to create order');
+      }
+
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: order.currency,
+        amount: data.amount,
+        currency: data.currency,
         name: 'TaskAPI',
         description: `${planDetails.name} Plan Subscription`,
-        order_id: order.id,
+        order_id: data.id,
         handler: async function (response: any) {
           try {
-            // Verify payment on backend
-            await axios.post(
-              `${config.SERVER_URL}/api/v1/payment/verify`,
-              {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                plan: planDetails.name
-              },
-              { withCredentials: true }
-            );
+            await apiInstance.post('/api/v1/payment/verify', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plan: planDetails.name
+            });
 
-            // Redirect to success page
             navigate('/payment-success', {
               state: {
                 plan: planDetails.name,
@@ -169,7 +154,6 @@ const Checkout = () => {
         </Button>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Plan Summary */}
           <div className="bg-surface-container-low rounded-3xl p-8 h-fit">
             <h2 className="text-2xl font-black text-on-surface mb-6">Order Summary</h2>
 
@@ -200,7 +184,6 @@ const Checkout = () => {
             </div>
           </div>
 
-          {/* Payment Section */}
           <div className="bg-surface-container-low rounded-3xl p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">

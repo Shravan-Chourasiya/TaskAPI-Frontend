@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Check, Zap, Shield, Crown, Building2, ArrowRight } from 'lucide-react';
 import React from 'react';
+import { usePlanStore } from '@/lib/planStore';
 
 
 
@@ -19,7 +20,16 @@ const PricingCard = ({
   features, 
   icon: Icon, 
   isFeatured = false 
-}:PricingCardType) => (
+}:PricingCardType) => {
+  const navigate = useNavigate();
+  const setSelectedPlan = usePlanStore((state) => state.setSelectedPlan);
+
+  const handleSelectPlan = () => {
+    setSelectedPlan({ name: title, price: parseFloat(price.replace('$', '')), features });
+    navigate('/checkout');
+  };
+
+  return (
   <div className={`p-10 rounded-[2.5rem] flex flex-col h-full transition-[background-color,box-shadow,transform] duration-300 ${
     isFeatured 
       ? 'bg-surface-container-lowest shadow-ambient-hover ring-2 ring-primary relative z-10 scale-105' 
@@ -54,15 +64,16 @@ const PricingCard = ({
       ))}
     </ul>
     
-    <Link to="/checkout" state={{ plan: { name: title, price: parseFloat(price.replace('$', '')), features } }} className={`w-full py-4 rounded-2xl font-black transition-[background-color,color,transform] text-center block ${
+    <button onClick={handleSelectPlan} className={`w-full py-4 rounded-2xl font-black transition-[background-color,color,transform] text-center block ${
       isFeatured 
         ? 'bg-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02]' 
         : 'bg-surface-container-high text-on-surface hover:bg-primary hover:text-on-primary hover:scale-[1.02]'
     }`}>
       Choose {title}
-    </Link>
+    </button>
   </div>
-);
+  );
+};
 
 const Pricing: React.FC = () => {
   return (

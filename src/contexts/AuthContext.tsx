@@ -1,7 +1,6 @@
 import { useEffect, type ReactNode, useRef } from 'react';
 import { AuthContext } from '@/utils/authContext';
 import authStore from '@/lib/zustandStore';
-import LandingPageSkeleton from '@/components/skeletons/LandingPageSkeleton';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const store = authStore();
@@ -15,10 +14,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
 
-
-  if (store.isLoading) {
-    return <LandingPageSkeleton />;
-  }
 
   return (
     <AuthContext.Provider value={{
