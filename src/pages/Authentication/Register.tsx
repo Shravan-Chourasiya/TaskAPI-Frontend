@@ -19,9 +19,7 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isOtpSent || otpSuccess) return;
-
-    setResendCooldown(config.OTP_RESEND_COOLDOWN_SECONDS);
+    if (!isOtpSent || otpSuccess || resendCooldown === 0) return;
 
     const intervalId = window.setInterval(() => {
       setResendCooldown((prev) => {
@@ -34,7 +32,7 @@ const Register: React.FC = () => {
     }, 1000);
 
     return () => window.clearInterval(intervalId);
-  }, [isOtpSent, otpSuccess]);
+  }, [isOtpSent, otpSuccess, resendCooldown]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +95,7 @@ const Register: React.FC = () => {
 
   const handleResendOtp = async () => {
     setError('');
+    setOtp('');
     try {
       await axios.post(`${config.SERVER_URL}/api/v1/auth/resend-otp`, { email });
       setResendCooldown(config.OTP_RESEND_COOLDOWN_SECONDS);

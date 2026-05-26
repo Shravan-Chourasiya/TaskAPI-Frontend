@@ -23,9 +23,7 @@ const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (step !== 'otp' || otpSuccess) return;
-
-    setResendCooldown(config.OTP_RESEND_COOLDOWN_SECONDS);
+    if (step !== 'otp' || otpSuccess || resendCooldown === 0) return;
 
     const intervalId = window.setInterval(() => {
       setResendCooldown((prev) => {
@@ -38,7 +36,7 @@ const ForgotPassword: React.FC = () => {
     }, 1000);
 
     return () => window.clearInterval(intervalId);
-  }, [step, otpSuccess]);
+  }, [step, otpSuccess, resendCooldown]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,6 +126,7 @@ const ForgotPassword: React.FC = () => {
 
   const handleResendOtp = async () => {
     setError('');
+    setOtp('');
     try {
       await apiInstance.post(`${config.SERVER_URL}/api/v1/auth/resend-otp`, { email });
       setResendCooldown(config.OTP_RESEND_COOLDOWN_SECONDS);
