@@ -59,11 +59,12 @@ const Checkout = () => {
 
     setLoading(true);
     try {
+      // Handle Free plan separately (no payment needed)
       if (planDetails.name === 'Free ') {
         const subscriptionPlanDetails = { planName: planDetails.name.trim(), autoRenewStatus: false, duration: 12, price: 0 };
-
         await apiInstance.post('/api/v1/subscription/buy-plan', { subscriptionPlanDetails });
         toast.success('Successfully subscribed to Free plan!');
+        usePlanStore.getState().clearSelectedPlan();
         navigate('/payment-success', {
           state: {
             plan: planDetails.name,
@@ -74,6 +75,7 @@ const Checkout = () => {
         return;
       }
 
+      // Load Razorpay script
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         toast.error('Failed to load payment gateway. Please try again.');
@@ -81,41 +83,44 @@ const Checkout = () => {
         return;
       }
 
-      const subscriptionPlanDetails = {
-        amount: planDetails.price * 100,
-        currency: 'INR',
-        receipt: `receipt_${Date.now()}`,
-        plan: planDetails
-      };
+      // Step 1: Create Order
+      const { data: orderData } = await apiInstance.post('/api/v1/subscription/create-order', {
+        planType: planDetails.name
+      });
 
-      const { data } = await apiInstance.post('/api/v1/subscription/buy-plan', { subscriptionPlanDetails });
-      if (!data) {
+      if (!orderData || !orderData.orderId) {
         throw new Error('Failed to create order');
       }
 
+      // Step 2: Open Razorpay Payment UI
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: data.amount,
-        currency: data.currency,
+        key: orderData.razorpayKeyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.orderId,
         name: 'TaskAPI',
         description: `${planDetails.name} Plan Subscription`,
-        order_id: data.id,
         handler: async function (response: any) {
           try {
-            await apiInstance.post('/api/v1/payment/verify', {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              plan: planDetails.name
+            // Step 3: Verify Payment
+            const { data: verifyData } = await apiInstance.post('/api/v1/subscription/verify-payment', {
+              orderId: response.razorpay_order_id,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature
             });
 
-            toast.success('Payment successful! Subscription activated.');
-            navigate('/payment-success', {
-              state: {
-                plan: planDetails.name,
-                amount: planDetails.price
-              }
-            });
+            if (verifyData.success) {
+              toast.success('Payment successful! Subscription activated.');
+              usePlanStore.getState().clearSelectedPlan();
+              navigate('/payment-success', {
+                state: {
+                  plan: planDetails.name,
+                  amount: planDetails.price
+                }
+              });
+            } else {
+              toast.error('Payment verification failed. Please contact support.');
+            }
           } catch (error) {
             console.error('Payment verification failed:', error);
             toast.error('Payment verification failed. Please contact support.');
@@ -127,7 +132,7 @@ const Checkout = () => {
           contact: ''
         },
         theme: {
-          color: '#6366f1'
+          color: '#00685f'
         },
         modal: {
           ondismiss: function () {
