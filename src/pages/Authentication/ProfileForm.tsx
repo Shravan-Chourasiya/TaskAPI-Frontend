@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
-import { User, MapPin, FileText, Upload, Link as LinkIcon, Save, X } from 'lucide-react';
+import { User, MapPin, FileText, Upload, Link as LinkIcon, Save, X, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiInstance } from '@/lib/axiosInstance';
 import authStore from '@/lib/zustandStore';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 type AvatarType = 'upload' | 'url';
 
 const ProfileForm = () => {
   const store = authStore();
   const user = store.user;
+  const navigate = useNavigate();
 
+  const [username, setUsername] = useState('');
+  const [usernamePassword, setUsernamePassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [bio, setBio] = useState('');
@@ -21,15 +25,19 @@ const ProfileForm = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [usernameLoading, setUsernameLoading] = useState(false);
 
   useEffect(() => {
-    if (user?.profile) {
-      setFirstName(user.profile.firstName || '');
-      setLastName(user.profile.lastName || '');
-      setBio(user.profile.bio || '');
-      setCountry(user.profile.country || '');
-      setCity(user.profile.city || '');
-      setAvatarUrl(user.profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`);
+    if (user) {
+      setUsername(user.username || '');
+      if (user.profile) {
+        setFirstName(user.profile.firstName || '');
+        setLastName(user.profile.lastName || '');
+        setBio(user.profile.bio || '');
+        setCountry(user.profile.country || '');
+        setCity(user.profile.city || '');
+        setAvatarUrl(user.profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`);
+      }
     }
   }, [user]);
 
@@ -48,6 +56,40 @@ const ProfileForm = () => {
   const handleRemoveFile = () => {
     setAvatarFile(null);
     setAvatarPreview('');
+  };
+
+  const handleUsernameUpdate = async () => {
+    if (!username.trim()) {
+      toast.error('Username cannot be empty');
+      return;
+    }
+
+    if (!usernamePassword) {
+      toast.error('Password is required to update username');
+      return;
+    }
+
+    const usernameRegex = /^[A-Za-z][A-Za-z0-9]{4,29}$/;
+    if (!usernameRegex.test(username)) {
+      toast.error('Username must start with a letter, contain only alphanumeric characters, and be 5-30 characters long');
+      return;
+    }
+    
+    setUsernameLoading(true);
+    try {
+      const response = await apiInstance.patch('/api/v1/auth/account/update', {
+        fieldToUpdate: 'username',
+        newValue: username,
+        password: usernamePassword
+      });
+      await store.refreshUser();
+      toast.success(response.data?.message || 'Username updated successfully!');
+      setUsernamePassword('');
+    } catch (error: unknown) {
+      toast.error((error as any).response?.data?.message || 'Failed to update username');
+    } finally {
+      setUsernameLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,7 +113,9 @@ const ProfileForm = () => {
       }
 
       const response = await apiInstance.patch('/api/v1/auth/profile/update', formData);
+      await store.refreshUser();
       toast.success(response.data?.message || 'Profile updated successfully!');
+      navigate('/profile');
     } catch (error: unknown) {
       toast.error((error as any).response?.data?.message || 'Failed to update profile. Please try again.');
       console.error('Error updating profile:', error);
@@ -96,6 +140,57 @@ const ProfileForm = () => {
 
         <div className="bg-surface-container-low rounded-3xl shadow-ambient p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Username Section */}
+            <div className="bg-surface-container rounded-2xl p-6 space-y-4">
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider">Update Username</h3>
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <label htmlFor="username" className="block text-xs font-bold text-secondary">
+                    Username
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
+                    <input
+                      id="username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-surface-container-low rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors"
+                      placeholder="Enter username"
+                    />
+                  </div>
+                  <p className="text-xs text-secondary">Must start with a letter, 5-30 alphanumeric characters</p>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="usernamePassword" className="block text-xs font-bold text-secondary">
+                    Current Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
+                    <input
+                      id="usernamePassword"
+                      type="password"
+                      value={usernamePassword}
+                      onChange={(e) => setUsernamePassword(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-surface-container-low rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors"
+                      placeholder="Enter password to confirm"
+                    />
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  onClick={handleUsernameUpdate}
+                  disabled={usernameLoading}
+                  className="w-full"
+                >
+                  {usernameLoading ? 'Updating Username...' : 'Update Username'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-outline-variant/20"></div>
+
             {/* Avatar Section */}
             <div className="space-y-4">
               <label className="block text-sm font-bold text-on-surface">
@@ -105,7 +200,7 @@ const ProfileForm = () => {
               <div className="flex items-start gap-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-container shadow-ambient shrink-0">
                   <img 
-                    src={currentAvatar} 
+                    src={currentAvatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
                     onError={(e) => {

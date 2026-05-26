@@ -1,6 +1,6 @@
 // Frontend/src/components/Layout/ProfileSidebar.tsx
 import { useState } from 'react';
-import { Key, LogOut, Copy, Eye, EyeOff, Settings, Edit } from 'lucide-react';
+import { Key, LogOut, Copy, Eye, EyeOff, X, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authStore from '@/lib/zustandStore';
 import { Button } from '../ui/button';
@@ -39,14 +39,12 @@ const ProfileSidebar = () => {
 
     return (
         <>
-            <Button
+            <button
                 onClick={() => setIsOpen(!isOpen)}
-                variant="ghost"
-                size="icon"
-                className="fixed top-4 right-4 z-50"
+                className="fixed top-4 right-4 z-50 w-10 h-10 rounded-full overflow-hidden bg-surface-container shadow-md hover:shadow-lg transition-shadow"
             >
-                <Settings className="w-5 h-5" />
-            </Button>
+                <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+            </button>
 
             <div
                 className={`fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-40 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -59,25 +57,21 @@ const ProfileSidebar = () => {
                     }`}
             >
                 <div className="flex flex-col h-full p-6">
-                    <Button
-                        onClick={() => setIsOpen(false)}
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-4 right-4"
-                    >
-                        <Settings className="w-5 h-5" />
-                    </Button>
-
                     {/* Profile Section */}
                     <div className="mb-6">
                         <div className="flex items-center gap-4 mb-4">
-                            <div className="w-16 h-16 rounded-full overflow-hidden bg-surface-container shadow-ambient flex-shrink-0">
-                                <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                            <div className="w-12 h-12 rounded-full overflow-hidden bg-surface-container shadow-ambient flex-shrink-0">
+                                <img src={avatarUrl} alt={user?.username} className="w-full h-full object-cover" />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <h2 className="text-lg font-bold text-on-surface truncate">{displayName}</h2>
-                                <p className="text-sm text-secondary truncate">@{user?.username}</p>
-                            </div>
+                            <h2 className="text-lg font-bold text-on-surface flex-1 truncate">{user?.username}</h2>
+                            <Button
+                                onClick={() => setIsOpen(false)}
+                                variant="ghost"
+                                size="icon"
+                                className="flex-shrink-0"
+                            >
+                                <X className="w-5 h-5" />
+                            </Button>
                         </div>
                         <Button
                             onClick={() => navigate('/profile')}

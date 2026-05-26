@@ -92,9 +92,7 @@ const Profile = () => {
                 <h3 className="text-lg font-bold text-on-surface">Location</h3>
               </div>
               <p className="text-on-surface">
-                {user?.profile?.city && user?.profile?.country 
-                  ? `${user.profile.city}, ${user.profile.country}`
-                  : user?.profile?.city || user?.profile?.country}
+                {[user?.profile?.city, user?.profile?.country].filter(Boolean).join(', ')}
               </p>
             </div>
           )}
