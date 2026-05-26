@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface PlanFeatures {
   name: string;
@@ -12,8 +13,13 @@ interface PlanStore {
   clearSelectedPlan: () => void;
 }
 
-export const usePlanStore = create<PlanStore>((set) => ({
-  selectedPlan: null,
-  setSelectedPlan: (plan) => set({ selectedPlan: plan }),
-  clearSelectedPlan: () => set({ selectedPlan: null }),
-}));
+export const usePlanStore = create<PlanStore>()(persist(
+  (set) => ({
+    selectedPlan: null,
+    setSelectedPlan: (plan) => set({ selectedPlan: plan }),
+    clearSelectedPlan: () => set({ selectedPlan: null }),
+  }),
+  {
+    name: 'plan-storage',
+  }
+));

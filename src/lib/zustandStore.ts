@@ -33,7 +33,7 @@ type AuthStore = {
 const authStore = create<AuthStore>((set) => ({
 	isAuthenticated: false,
 	user: null,
-	isLoading: false,
+	isLoading: true,
 	
 	login: async (email: string, password: string) => {
 		set({ isLoading: true });

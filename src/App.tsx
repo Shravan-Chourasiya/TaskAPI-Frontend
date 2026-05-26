@@ -19,14 +19,24 @@ import Notfound from './pages/Utility/Notfound';
 import Dashboard from './pages/Authentication/Dashboard';
 import { ProtectedRoute } from './utils/routesProtection';
 import { PublicRoute } from './utils/PublicRoute';
+import { useAuth } from './hooks/useAuth';
+import LoadingSpinner from './components/ui/LoadingSpinner';
 
 
 
-const LayoutWrapper = () => (
-  <Layout>
-    <Outlet />
-  </Layout>
-);
+const LayoutWrapper = () => {
+  const { isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
+};
 
 
 const router = createBrowserRouter([
