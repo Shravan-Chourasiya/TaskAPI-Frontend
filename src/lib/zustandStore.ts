@@ -14,6 +14,7 @@ type User = {
 		country?: string;
 		city?: string;
 	};
+	phone?: string;
 };
 
 type AuthStore = {
