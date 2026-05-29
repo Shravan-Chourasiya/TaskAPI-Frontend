@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiInstance } from '@/lib/axiosInstance';
 import { usePlanStore } from '@/lib/planStore';
 import { toast } from 'sonner';
+import { config } from '@/utils/config';
 
 declare global {
   interface Window {
@@ -20,10 +21,19 @@ interface PlanDetails {
   features: string[];
 }
 
+
 const Checkout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const selectedPlan = usePlanStore((state) => state.selectedPlan);
+  const { isAuthenticated, user } = useAuth();
+  if (!user || !isAuthenticated) {
+    toast.error('User not authenticated. Please login to continue.');
+    navigate('/login');
+    return null;
+  }
+  const name = `${user.profile?.firstName} ${user.profile?.lastName}`
+  const authUser = { ...user, name: name || user.username }
 
   const planDetails: PlanDetails = selectedPlan || {
     name: 'Basic',
@@ -48,7 +58,6 @@ const Checkout = () => {
     });
   };
 
-  const { isAuthenticated } = useAuth();
 
   const handlePayment = async () => {
     if (!isAuthenticated) {
@@ -59,10 +68,9 @@ const Checkout = () => {
 
     setLoading(true);
     try {
-      // Handle Free plan separately (no payment needed)
       if (planDetails.name === 'Free ') {
         const subscriptionPlanDetails = { planName: planDetails.name.trim(), autoRenewStatus: false, duration: 12, price: 0 };
-        await apiInstance.post('/api/v1/subscription/buy-plan', { subscriptionPlanDetails });
+        await apiInstance.post('/api/v1/subscription/create-order', { subscriptionPlanDetails });
         toast.success('Successfully subscribed to Free plan!');
         usePlanStore.getState().clearSelectedPlan();
         navigate('/payment-success', {
@@ -84,52 +92,80 @@ const Checkout = () => {
       }
 
       // Step 1: Create Order
-      const { data: orderData } = await apiInstance.post('/api/v1/subscription/create-order', {
-        planType: planDetails.name
+      const createOrderResponse = await apiInstance.post('/api/v1/subscription/create-order', {
+        subscriptionPlanDetails: {
+          planName: planDetails.name,
+          autoRenewStatus: true,
+          duration: 1,
+          price: planDetails.price
+        }
       });
 
-      if (!orderData || !orderData.orderId) {
+      console.log('Create Order Response:', createOrderResponse);
+      if (!createOrderResponse.data || !createOrderResponse.data.razorpayOrder) {
         throw new Error('Failed to create order');
       }
 
       // Step 2: Open Razorpay Payment UI
       const options = {
-        key: orderData.razorpayKeyId,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        order_id: orderData.orderId,
+        key: config.RAZORPAY_KEY_ID,
+        amount: createOrderResponse.data.razorpayOrder.amount,
+        currency: createOrderResponse.data.razorpayOrder.currency,
+        order_id: createOrderResponse.data.razorpayOrder.id,
         name: 'TaskAPI',
         description: `${planDetails.name} Plan Subscription`,
         handler: async function (response: any) {
           try {
+
             // Step 3: Verify Payment
-            const { data: verifyData } = await apiInstance.post('/api/v1/subscription/verify-payment', {
-              orderId: response.razorpay_order_id,
-              paymentId: response.razorpay_payment_id,
-              signature: response.razorpay_signature
+            console.log('Payment Response from Razorpay:::::', response);
+            console.log(`
+              transactionId:${response.razorpay_order_id},
+              razorPayID: ${response.razorpay_payment_id},
+              signature: ${response.razorpay_signature},
+              razorPayData: {
+              transactionId: ${createOrderResponse.data.razorpayOrder.receipt},
+            }`)
+            const verifyPaymentResponse = await apiInstance.post('/api/v1/subscription/verify-payment', {
+              transactionId: response.razorpay_order_id,
+              razorPayID: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+              razorPayData: {
+                transactionId: createOrderResponse.data.razorpayOrder.receipt, // Pass the original transactionId (receipt) to the backend for verification
+              }
             });
 
-            if (verifyData.success) {
-              toast.success('Payment successful! Subscription activated.');
-              usePlanStore.getState().clearSelectedPlan();
-              navigate('/payment-success', {
-                state: {
-                  plan: planDetails.name,
-                  amount: planDetails.price
-                }
-              });
-            } else {
+            if (!verifyPaymentResponse.data.success || !verifyPaymentResponse) {
               toast.error('Payment verification failed. Please contact support.');
             }
+
+            toast.success(verifyPaymentResponse.data.message || 'Payment successful! Subscription activated.');
+
+            usePlanStore.getState().clearSelectedPlan();
+
+            navigate('/payment-success', {
+              state: {
+                plan: planDetails.name,
+                amount: planDetails.price
+              }
+            });
+
           } catch (error) {
-            console.error('Payment verification failed:', error);
+            console.error(`Payment verification failed.! || ${error} || 
+              ${response.error.code} ||
+              ${response.error.description} || 
+              ${response.error.source} || 
+              ${response.error.step} || 
+              ${response.error.reason} || 
+              ${response.error.metadata.order_id} || 
+              ${response.error.metadata.payment_id}`);
             toast.error('Payment verification failed. Please contact support.');
           }
         },
         prefill: {
-          name: '',
-          email: '',
-          contact: ''
+          name: authUser.name || '',
+          email: authUser.email || '',
+          contact: authUser.phone || ''
         },
         theme: {
           color: '#00685f'
