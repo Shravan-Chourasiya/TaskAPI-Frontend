@@ -5,6 +5,7 @@ import { apiInstance } from '@/lib/axiosInstance';
 import authStore from '@/lib/zustandStore';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { USERNAME_REGEX, BIO_MAX_LENGTH, DICEBEAR_AVATAR_API, API_ENDPOINTS } from '@/constants';
 
 type AvatarType = 'upload' | 'url';
 
@@ -36,7 +37,7 @@ const ProfileForm = () => {
         setBio(user.profile.bio || '');
         setCountry(user.profile.country || '');
         setCity(user.profile.city || '');
-        setAvatarUrl(user.profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`);
+        setAvatarUrl(user.profile.avatarUrl || `${DICEBEAR_AVATAR_API}?seed=${user.username}`);
       }
     }
   }, [user]);
@@ -69,7 +70,7 @@ const ProfileForm = () => {
       return;
     }
 
-    const usernameRegex = /^[A-Za-z][A-Za-z0-9]{4,29}$/;
+    const usernameRegex = USERNAME_REGEX;
     if (!usernameRegex.test(username)) {
       toast.error('Username must start with a letter, contain only alphanumeric characters, and be 5-30 characters long');
       return;
@@ -77,7 +78,7 @@ const ProfileForm = () => {
     
     setUsernameLoading(true);
     try {
-      const response = await apiInstance.patch('/api/v1/auth/account/update', {
+      const response = await apiInstance.patch(API_ENDPOINTS.AUTH.ACCOUNT_UPDATE, {
         fieldToUpdate: 'username',
         newValue: username,
         password: usernamePassword
@@ -112,7 +113,7 @@ const ProfileForm = () => {
         formData.append('avatarUrl', '');
       }
 
-      const response = await apiInstance.patch('/api/v1/auth/profile/update', formData);
+      const response = await apiInstance.patch(API_ENDPOINTS.AUTH.PROFILE_UPDATE, formData);
       await store.refreshUser();
       toast.success(response.data?.message || 'Profile updated successfully!');
       navigate('/profile');
@@ -342,7 +343,7 @@ const ProfileForm = () => {
                 />
               </div>
               <p className="text-xs text-secondary">
-                {bio.length} / 500 characters
+                {bio.length} / {BIO_MAX_LENGTH} characters
               </p>
             </div>
 
@@ -407,7 +408,7 @@ const ProfileForm = () => {
                     setBio(user.profile.bio || '');
                     setCountry(user.profile.country || '');
                     setCity(user.profile.city || '');
-                    setAvatarUrl(user.profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`);
+                    setAvatarUrl(user.profile.avatarUrl || `${DICEBEAR_AVATAR_API}?seed=${user.username}`);
                   } else {
                     setFirstName('');
                     setLastName('');

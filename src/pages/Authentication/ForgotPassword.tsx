@@ -6,6 +6,7 @@ import OTPVerification from '@/components/auth/OTPVerification';
 import { type AxiosError } from 'axios';
 import { config } from '@/utils/config';
 import { apiInstance } from '@/lib/axiosInstance';
+import { API_ENDPOINTS } from '@/constants';
 
 type Step = 'email' | 'otp' | 'reset';
 
@@ -72,7 +73,7 @@ const ForgotPassword: React.FC = () => {
     setError('');
 
     try {
-      const response = await apiInstance.post(`${config.SERVER_URL}/api/v1/auth/verify?purpose=fr-pa`, { otp, email });
+      const response = await apiInstance.post(`${config.SERVER_URL}${API_ENDPOINTS.AUTH.VERIFY}?purpose=fr-pa`, { otp, email });
       if (!response.data.data) {
         setError(response.data.message || 'Invalid or expired code. Please try again.');
         setLoading(false);
@@ -128,7 +129,7 @@ const ForgotPassword: React.FC = () => {
     setError('');
     setOtp('');
     try {
-      await apiInstance.post(`${config.SERVER_URL}/api/v1/auth/resend-otp`, { email });
+      await apiInstance.post(`${config.SERVER_URL}${API_ENDPOINTS.AUTH.RESEND_OTP}`, { email });
       setResendCooldown(config.OTP_RESEND_COOLDOWN_SECONDS);
     } catch (err: unknown) {
       const error = err as AxiosError<{ message?: string }>;

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { config } from '@/utils/config';
 import RegisterForm from '../../components/auth/RegisterForm';
 import OTPVerification from '../../components/auth/OTPVerification';
-import { OTP_LENGTH } from '../../constants';
+import { OTP_LENGTH, API_ENDPOINTS } from '../../constants';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -41,7 +41,7 @@ const Register: React.FC = () => {
 
     try {
       await axios.post(
-        `${config.SERVER_URL}/api/v1/auth/register`,
+        `${config.SERVER_URL}${API_ENDPOINTS.AUTH.REGISTER}`,
         { username, email, password },
       );
       setError('');
@@ -51,7 +51,8 @@ const Register: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       // Check if user is already registered but not verified
-      if (err.response?.data?.isRegisteredButNotVerified) {
+      const isRegisteredButNotVerified = err.response?.data?.isRegisteredButNotVerified || err.response?.data?.data?.isRegisteredButNotVerified;
+      if (isRegisteredButNotVerified) {
         setIsOtpSent(true);
       }
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
@@ -73,7 +74,7 @@ const Register: React.FC = () => {
 
     try {
       await axios.post(
-        `${config.SERVER_URL}/api/v1/auth/verify?purpose=ve-em-or`,
+        `${config.SERVER_URL}${API_ENDPOINTS.AUTH.VERIFY}?purpose=ve-em-or`,
         { otp, email },
       );
       setOtpSuccess(true);
@@ -97,7 +98,7 @@ const Register: React.FC = () => {
     setError('');
     setOtp('');
     try {
-      await axios.post(`${config.SERVER_URL}/api/v1/auth/resend-otp`, { email });
+      await axios.post(`${config.SERVER_URL}${API_ENDPOINTS.AUTH.RESEND_OTP}`, { email });
       setResendCooldown(config.OTP_RESEND_COOLDOWN_SECONDS);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {

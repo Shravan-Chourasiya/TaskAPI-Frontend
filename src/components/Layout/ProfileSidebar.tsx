@@ -4,6 +4,7 @@ import { Key, LogOut, Copy, Eye, EyeOff, X, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authStore from '@/lib/zustandStore';
 import { Button } from '../ui/button';
+import { DICEBEAR_AVATAR_API, MOCK_API_KEY, COPIED_FEEDBACK_DURATION } from '@/constants';
 
 const ProfileSidebar = () => {
     const navigate = useNavigate();
@@ -14,18 +15,18 @@ const ProfileSidebar = () => {
     const user = store.user;
 
     // Fallback avatar if no profile avatar
-    const avatarUrl = user?.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username || 'default'}`;
+    const avatarUrl = user?.profile?.avatarUrl || `${DICEBEAR_AVATAR_API}?seed=${user?.username || 'default'}`;
     const displayName = user?.profile?.firstName && user?.profile?.lastName 
         ? `${user.profile.firstName} ${user.profile.lastName}`
         : user?.username || 'User';
 
     // Mock API key - replace with actual API key from backend
-    const apiKey = 'tk_live_492x82abc123def456';
+    const apiKey = MOCK_API_KEY;
 
     const handleCopyApiKey = () => {
         navigator.clipboard.writeText(apiKey);
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setTimeout(() => setCopied(false), COPIED_FEEDBACK_DURATION);
     };
 
     const handleLogout = async () => {

@@ -2,12 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { Edit, Mail, MapPin, FileText, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import authStore from '@/lib/zustandStore';
+import { DICEBEAR_AVATAR_API } from '@/constants';
 
 const Profile = () => {
   const navigate = useNavigate();
   const user = authStore((state) => state.user);
 
-  const avatarUrl = user?.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username || 'default'}`;
+  const avatarUrl = user?.profile?.avatarUrl || `${DICEBEAR_AVATAR_API}?seed=${user?.username || 'default'}`;
   const hasProfile = user?.profile && (user.profile.firstName || user.profile.lastName || user.profile.bio);
 
   if (!hasProfile) {

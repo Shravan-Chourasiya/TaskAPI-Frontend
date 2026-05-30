@@ -8,6 +8,7 @@ import { apiInstance } from '@/lib/axiosInstance';
 import { usePlanStore } from '@/lib/planStore';
 import { toast } from 'sonner';
 import { config } from '@/utils/config';
+import { RAZORPAY_SCRIPT_URL, APP_NAME, PRIMARY_COLOR, DEFAULT_PLAN, API_ENDPOINTS } from '@/constants';
 
 declare global {
   interface Window {
@@ -35,23 +36,12 @@ const Checkout = () => {
   const name = `${user.profile?.firstName} ${user.profile?.lastName}`
   const authUser = { ...user, name: name || user.username }
 
-  const planDetails: PlanDetails = selectedPlan || {
-    name: 'Basic',
-    price: 5,
-    features: [
-      'Up to 10,000 MAU',
-      'Passkey Support',
-      'OAuth Providers',
-      'Email Support',
-      'Standard Infrastructure',
-      'Basic Analytics'
-    ]
-  };
+  const planDetails: PlanDetails = selectedPlan || DEFAULT_PLAN;
 
   const loadRazorpayScript = (): Promise<boolean> => {
     return new Promise((resolve) => {
       const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.src = RAZORPAY_SCRIPT_URL;
       script.onload = () => resolve(true);
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
@@ -70,7 +60,7 @@ const Checkout = () => {
     try {
       if (planDetails.name === 'Free ') {
         const subscriptionPlanDetails = { planName: planDetails.name.trim(), autoRenewStatus: false, duration: 12, price: 0 };
-        await apiInstance.post('/api/v1/subscription/create-order', { subscriptionPlanDetails });
+        await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.CREATE_ORDER, { subscriptionPlanDetails });
         toast.success('Successfully subscribed to Free plan!');
         usePlanStore.getState().clearSelectedPlan();
         navigate('/payment-success', {
@@ -92,7 +82,7 @@ const Checkout = () => {
       }
 
       // Step 1: Create Order
-      const createOrderResponse = await apiInstance.post('/api/v1/subscription/create-order', {
+      const createOrderResponse = await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.CREATE_ORDER, {
         subscriptionPlanDetails: {
           planName: planDetails.name,
           autoRenewStatus: true,
@@ -112,7 +102,7 @@ const Checkout = () => {
         amount: createOrderResponse.data.razorpayOrder.amount,
         currency: createOrderResponse.data.razorpayOrder.currency,
         order_id: createOrderResponse.data.razorpayOrder.id,
-        name: 'TaskAPI',
+        name: APP_NAME,
         description: `${planDetails.name} Plan Subscription`,
         handler: async function (response: any) {
           try {
@@ -126,7 +116,7 @@ const Checkout = () => {
               razorPayData: {
               transactionId: ${createOrderResponse.data.razorpayOrder.receipt},
             }`)
-            const verifyPaymentResponse = await apiInstance.post('/api/v1/subscription/verify-payment', {
+            const verifyPaymentResponse = await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.VERIFY_PAYMENT, {
               transactionId: response.razorpay_order_id,
               razorPayID: response.razorpay_payment_id,
               signature: response.razorpay_signature,
@@ -168,7 +158,7 @@ const Checkout = () => {
           contact: authUser.phone || ''
         },
         theme: {
-          color: '#00685f'
+          color: PRIMARY_COLOR
         },
         modal: {
           ondismiss: function () {
