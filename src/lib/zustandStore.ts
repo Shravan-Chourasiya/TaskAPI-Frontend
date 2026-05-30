@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { apiInstance } from "./axiosInstance";
+import { API_ENDPOINTS } from "@/constants";
 
 type User = {
 	email: string;
@@ -39,7 +40,7 @@ const authStore = create<AuthStore>((set) => ({
 	login: async (email: string, password: string) => {
 		set({ isLoading: true });
 		try {
-			const response = await apiInstance.post('/api/v1/auth/login', { email, password });
+			const response = await apiInstance.post(API_ENDPOINTS.AUTH.LOGIN, { email, password });
 			if (!response.data || !response.data.data) {
 				throw new Error('Invalid response from server. Failed to Login. Try again later');
 			}
@@ -54,7 +55,7 @@ const authStore = create<AuthStore>((set) => ({
 	logout: async () => {
 		set({ isLoading: true });
 		try {
-			const response = await apiInstance.post('/api/v1/auth/logout');
+			const response = await apiInstance.post(API_ENDPOINTS.AUTH.LOGOUT);
 			if (response.status !== 200) {
 				console.error('Logout failed with status:', response.status);
 				throw new Error(`Logout failed with status: ${response.status}`);
@@ -72,15 +73,15 @@ const authStore = create<AuthStore>((set) => ({
 	refreshUser: async () => {
 		set({ isLoading: true });
 		try {
-			const response = await apiInstance.get('/api/v1/user/is-user');
-			if (!response.data || !response.data.user) {
+			const response = await apiInstance.get(API_ENDPOINTS.USER.IS_USER);
+			if (!response.data || !response.data.data) {
 				throw new Error('Invalid response from server. Failed to refresh user. Try again later');
 			}
-			if(!response.data.isUser) {
+			if(!response.data.data.isUser) {
 				set({ isAuthenticated: false, user: null, isLoading: false });
 				return;
 			}
-			set({ user: response.data.user, isLoading: false });
+			set({ user: response.data.data.user, isLoading: false });
 		} catch (error) {
 			console.error('Failed to refresh user:', error);
 			set({ isAuthenticated: false, user: null, isLoading: false });
@@ -90,9 +91,9 @@ const authStore = create<AuthStore>((set) => ({
 	checkAuth: async () => {
 		set({ isLoading: true });
 		try {
-			const response = await apiInstance.get('/api/v1/user/is-user');
-			if (response.status === 200 && response.data && response.data.user) {
-				set({ isAuthenticated: true, user: response.data.user, isLoading: false });
+			const response = await apiInstance.get(API_ENDPOINTS.USER.IS_USER);
+			if (response.status === 200 && response.data && response.data.data && response.data.data.isUser) {
+				set({ isAuthenticated: true, user: response.data.data.user, isLoading: false });
 			} else {
 				set({ isAuthenticated: false, user: null, isLoading: false });
 			}

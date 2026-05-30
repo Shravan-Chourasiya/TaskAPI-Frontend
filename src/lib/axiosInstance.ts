@@ -1,4 +1,4 @@
-import { REFRESH_TIMEOUT_MS, TOKEN_ERROR_STATUSES } from "@/constants";
+import { REFRESH_TIMEOUT_MS, TOKEN_ERROR_STATUSES, API_ENDPOINTS } from "@/constants";
 import { config } from "@/utils/config";
 import authStore from "@/lib/zustandStore";
 import axios from "axios";
@@ -36,7 +36,7 @@ const refreshToken = (): Promise<void> => {
 	let timeoutId: ReturnType<typeof setTimeout>;
 	
 	const refresh = apiInstance
-		.post("/api/v1/auth/token/refresh")
+		.post(API_ENDPOINTS.AUTH.TOKEN_REFRESH)
 		.then(() => {
 			clearTimeout(timeoutId);
 			return void 0;
@@ -62,13 +62,13 @@ apiInstance.interceptors.response.use(
 		}
 		
 		const status: number = error.response?.status;
-		const isTokenError: boolean = error.response?.data?.tokenExpired === true;
+		const isTokenError: boolean = error.response?.data?.data?.requiresReAuth === true;
 
 		const shouldAttemptRefresh =
 			TOKEN_ERROR_STATUSES.has(status) &&
 			isTokenError &&
 			!originalRequest._retry &&
-			!originalRequest.url?.includes("auth/token/refresh");
+			!originalRequest.url?.includes(API_ENDPOINTS.AUTH.TOKEN_REFRESH);
 
 		if (!shouldAttemptRefresh) {
 			return Promise.reject(error);
