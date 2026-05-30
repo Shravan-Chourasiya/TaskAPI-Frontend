@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { 
-  Send, 
-  MessageCircle, 
-  Hash, 
+import {
+  Send,
+  MessageCircle,
+  Hash,
   Mail,
   CheckCircle2,
   Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { apiInstance } from '@/lib/axiosInstance';
+import { toast } from 'sonner';
 
 const Contact: React.FC = () => {
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success'>('idle');
+  const [status, setStatus] = useState<'failed' | "idle" | 'sending' | 'success'>('idle');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -21,18 +23,20 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setStatus('sending');
 
-    // Simulate real API workflow
-    // To implement "Actually send mail", you can use Formspree or EmailJS
-    // Example: await fetch('https://formspree.io/f/your-id', { method: 'POST', body: JSON.stringify(formData) })
-    
-    setTimeout(() => {
-      setStatus('success');
-      // Reset form
-      setFormData({ name: '', email: '', message: '' });
-      
-      // Auto-reset status after 5 seconds to allow another message
-      setTimeout(() => setStatus('idle'), 5000);
-    }, 2000);
+    const response = await apiInstance.post('/api/v1/user/contact-us', formData);
+    if (!response.data.success) {
+      setStatus('failed');
+      toast.error(response.data.message || 'Failed to send message. Please try again later.');
+      return;
+    }
+
+    setStatus('success');
+    setFormData({
+      name: '',
+      email: '',
+      message: ''
+    });
+    toast.success(response.data.message || 'Message sent successfully!');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -45,12 +49,12 @@ const Contact: React.FC = () => {
         {/* Background Accents */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary-container/20 rounded-full -ml-32 -mb-32 blur-3xl"></div>
-        
+
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-10">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-black text-on-primary leading-tight -tracking-widest">
-                Let's Build the <br/>Future of Identity.
+                Let's Build the <br />Future of Identity.
               </h1>
               <p className="text-on-primary/80 text-xl font-medium max-w-md">
                 Have questions about custom implementation or high-volume usage? Our engineering team is ready to assist.
@@ -98,41 +102,41 @@ const Contact: React.FC = () => {
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-secondary uppercase tracking-widest pl-1">Full Name</label>
-                    <input 
+                    <input
                       required
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      type="text" 
+                      type="text"
                       placeholder="Enter your full name"
-                      className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-[box-shadow] outline-none"
+                      className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-shadow outline-none"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-secondary uppercase tracking-widest pl-1">Work Email</label>
-                    <input 
+                    <input
                       required
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      type="email" 
+                      type="email"
                       placeholder="your.email@company.com"
-                      className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-[box-shadow] outline-none"
+                      className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-shadow  outline-none"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-secondary uppercase tracking-widest pl-1">Project Details</label>
-                    <textarea 
+                    <textarea
                       required
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
                       rows={4}
                       placeholder="Describe your project requirements and use case..."
-                      className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-[box-shadow] outline-none resize-none"
+                      className="w-full bg-surface-container-low border-none rounded-2xl p-4 font-bold text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-shadow  outline-none resize-none"
                     ></textarea>
                   </div>
-                  <Button 
+                  <Button
                     type="submit"
                     disabled={status === 'sending'}
                     size="lg"
