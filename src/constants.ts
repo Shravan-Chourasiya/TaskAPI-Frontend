@@ -27,7 +27,7 @@ export const API_ENDPOINTS = {
 };
 
 // Username validation
-export const USERNAME_REGEX = /^[A-Za-z][A-Za-z0-9]{4,29}$/;
+export const USERNAME_REGEX = /^[A-Za-z][A-Za-z0-9_-]{4,29}$/;
 export const USERNAME_MIN_LENGTH = 5;
 export const USERNAME_MAX_LENGTH = 30;
 

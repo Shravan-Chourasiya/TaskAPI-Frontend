@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
@@ -26,9 +26,16 @@ import LoadingSpinner from './components/ui/LoadingSpinner';
 
 const LayoutWrapper = () => {
   const { isLoading } = useAuth();
+  const location = useLocation();
+  const isDashboard = location.pathname === '/dashboard';
   
   if (isLoading) {
     return <LoadingSpinner />;
+  }
+  
+  // Dashboard has its own layout, no navbar/footer
+  if (isDashboard) {
+    return <Outlet />;
   }
   
   return (
