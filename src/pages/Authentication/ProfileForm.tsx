@@ -72,7 +72,7 @@ const ProfileForm = () => {
 
     const usernameRegex = USERNAME_REGEX;
     if (!usernameRegex.test(username)) {
-      toast.error('Username must start with a letter, contain only alphanumeric characters, and be 5-30 characters long');
+      toast.error('Username must start with a letter and contain only letters, numbers, hyphens, and underscores (5-30 characters)');
       return;
     }
     
@@ -160,7 +160,7 @@ const ProfileForm = () => {
                       placeholder="Enter username"
                     />
                   </div>
-                  <p className="text-xs text-secondary">Must start with a letter, 5-30 alphanumeric characters</p>
+                  <p className="text-xs text-secondary">Must start with a letter, 5-30 characters (letters, numbers, hyphens, underscores)</p>
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="usernamePassword" className="block text-xs font-bold text-secondary">
