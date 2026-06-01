@@ -52,6 +52,48 @@ export const PRIMARY_COLOR = '#00685f';
 export const COPIED_FEEDBACK_DURATION = 2000; // 2 seconds
 
 // Subscription plans
+export const PRICING_PLANS = [
+  {
+    title: 'Free',
+    price: '$0',
+    icon: 'Key',
+    buttonText: 'Get Started',
+    isFeatured: false,
+    features: [
+      'Up to 1,000 active sessions',
+      'Basic email support',
+      'Standard response latency'
+    ]
+  },
+  {
+    title: 'Basic',
+    price: '$5',
+    icon: 'RefreshCw',
+    buttonText: 'Buy Now',
+    isFeatured: false,
+    features: [
+      'Up to 50,000 active sessions',
+      'Priority developer support',
+      '100ms global response guarantee',
+      'Webhooks integration'
+    ]
+  },
+  {
+    title: 'Pro',
+    price: '$15',
+    icon: 'Zap',
+    buttonText: 'Buy Pro Now',
+    isFeatured: true,
+    features: [
+      'Unlimited active sessions',
+      '24/7 dedicated phone support',
+      '15ms ultra-low latency guarantee',
+      'Custom domains & SSL',
+      'Advanced analytics dashboard'
+    ]
+  }
+];
+
 export const DEFAULT_PLAN = {
   name: 'Basic',
   price: 5,

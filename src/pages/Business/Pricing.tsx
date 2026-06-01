@@ -1,7 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Check, Zap, Shield, Crown, Building2, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Check, Key, RefreshCw, Zap } from 'lucide-react';
 import React from 'react';
 import { usePlanStore } from '@/lib/planStore';
+import { PRICING_PLANS } from '@/constants';
 
 
 
@@ -10,8 +11,15 @@ type PricingCardType = {
   price: string,
   features: string[],
   icon: React.ElementType,
-  isFeatured?: boolean
+  isFeatured?: boolean,
+  buttonText?: string
 }
+
+const iconMap = {
+  Key,
+  RefreshCw,
+  Zap
+};
 
 
 const PricingCard = ({ 
@@ -19,7 +27,8 @@ const PricingCard = ({
   price, 
   features, 
   icon: Icon, 
-  isFeatured = false 
+  isFeatured = false,
+  buttonText = 'Get Started'
 }:PricingCardType) => {
   const navigate = useNavigate();
   const setSelectedPlan = usePlanStore((state) => state.setSelectedPlan);
@@ -30,46 +39,36 @@ const PricingCard = ({
   };
 
   return (
-  <div className={`p-10 rounded-[2.5rem] flex flex-col h-full transition-[background-color,box-shadow,transform] duration-300 ${
-    isFeatured 
-      ? 'bg-surface-container-lowest shadow-ambient-hover ring-2 ring-primary relative z-10 scale-105' 
-      : 'bg-surface-container-low hover:bg-surface-container-lowest hover:shadow-ambient group'
-  }`}>
+  <div className={`bg-surface shadow-lg rounded-md p-8 flex flex-col items-start transition-transform hover:-translate-y-1 duration-300 relative overflow-hidden`}>
+    <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
     {isFeatured && (
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-on-primary px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
-        Most Advanced
+      <div className="absolute top-4 -right-12 bg-primary text-on-primary text-xs font-bold px-9 py-2 rotate-45 shadow-md">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MOST POPULAR
       </div>
     )}
-    <div className="mb-8">
-      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors ${
-        isFeatured ? 'bg-primary text-on-primary' : 'bg-white text-primary group-hover:bg-primary group-hover:text-white'
-      }`}>
-        <Icon className="w-7 h-7" />
+    <div className="flex items-center justify-between w-full mb-8">
+      <div className="flex items-center gap-4">
+        <div className="text-primary">
+          <Icon className="w-8 h-8" />
+        </div>
+        <h3 className="text-2xl font-bold">{title}</h3>
       </div>
-      <h3 className="text-2xl font-black text-on-surface mb-2">{title}</h3>
-      <div className="flex items-baseline gap-1">
-        <span className="text-4xl font-black text-on-surface">{price}</span>
-        <span className="text-secondary font-bold text-sm">/month</span>
+      <div className={`text-[32px] font-mono text-on-surface leading-none ${isFeatured ? 'mr-8' : ''}`}>
+        {price}<span className="text-base font-normal text-on-surface-variant">/mo</span>
       </div>
     </div>
     
-    <ul className="space-y-4 mb-10 grow">
+    <ul className="space-y-4 mb-10 w-full">
       {features.map((feature, i) => (
-        <li key={i} className="flex items-center gap-3 text-secondary font-medium">
-          <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <Check className="w-3 h-3 text-primary stroke-4" />
-          </div>
+        <li key={i} className="flex items-center gap-3 text-sm text-on-surface-variant">
+          <Check className="w-5 h-5 text-primary shrink-0" />
           {feature}
         </li>
       ))}
     </ul>
     
-    <button onClick={handleSelectPlan} className={`w-full py-4 rounded-2xl font-black transition-[background-color,color,transform] text-center block ${
-      isFeatured 
-        ? 'bg-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02]' 
-        : 'bg-surface-container-high text-on-surface hover:bg-primary hover:text-on-primary hover:scale-[1.02]'
-    }`}>
-      Choose {title}
+    <button onClick={handleSelectPlan} className="mt-auto w-full bg-primary text-on-primary px-6 py-3 rounded-md text-sm font-bold hover:opacity-90 active:scale-95 transition-all">
+      {buttonText}
     </button>
   </div>
   );
@@ -91,97 +90,18 @@ const Pricing: React.FC = () => {
       </section>
 
       <section className="pb-16 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 items-center">
-          <PricingCard 
-            title="Free "
-            price="$0"
-            icon={Zap}
-            features={[
-              "Up to 1,000 MAU",
-              "Basic Authentication",
-              "Email/Password Login",
-              "Community Support",
-              "Shared Infrastructure"
-            ]}
-          />
-          <PricingCard 
-            title="Basic"
-            price="$5"
-            isFeatured={true}
-            icon={Shield}
-            features={[
-              "Up to 10,000 MAU",
-              "Passkey Support",
-              "OAuth Providers",
-              "Email Support",
-              "Standard Infrastructure",
-              "Basic Analytics"
-            ]}
-          />
-          <PricingCard 
-            title="Pro"
-            price="$15"
-            icon={Crown}
-            features={[
-              "Up to 100,000 MAU",
-              "Advanced Multi-tenant",
-              "Priority 24/7 Support",
-              "Dedicated Cluster",
-              "Custom JWT Claims",
-              "Advanced Analytics",
-              "SLA Protection",
-              "Webhook Events"
-            ]}
-          />
-        </div>
-      </section>
-
-      <section className="pb-24 px-6 max-w-5xl mx-auto">
-        <div className="bg-linear-to-br from-primary/5 via-surface-container-low to-primary/10 rounded-[2.5rem] p-12 md:p-16 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-          
-          <div className="relative z-10 text-center space-y-6">
-            <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto">
-              <Building2 className="w-10 h-10 text-primary" />
-            </div>
-            
-            <h2 className="text-4xl md:text-5xl font-black text-on-surface -tracking-[0.02em]">
-              Enterprise Solutions
-            </h2>
-            
-            <p className="text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
-              Need unlimited MAU, dedicated infrastructure, custom SLAs, or white-label solutions? 
-              Let's build a plan tailored to your organization's needs.
-            </p>
-            
-            <div className="flex flex-wrap gap-4 justify-center pt-4">
-              <div className="flex items-center gap-2 text-sm font-bold text-on-surface">
-                <Check className="w-5 h-5 text-primary" />
-                Unlimited MAU
-              </div>
-              <div className="flex items-center gap-2 text-sm font-bold text-on-surface">
-                <Check className="w-5 h-5 text-primary" />
-                Custom SLA
-              </div>
-              <div className="flex items-center gap-2 text-sm font-bold text-on-surface">
-                <Check className="w-5 h-5 text-primary" />
-                White-label
-              </div>
-              <div className="flex items-center gap-2 text-sm font-bold text-on-surface">
-                <Check className="w-5 h-5 text-primary" />
-                Dedicated Support
-              </div>
-            </div>
-            
-            <Link 
-              to="/contact" 
-              className="inline-flex items-center gap-2 bg-primary text-on-primary px-8 py-4 rounded-2xl font-black text-lg shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
-            >
-              Contact Sales
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {PRICING_PLANS.map((plan) => (
+            <PricingCard
+              key={plan.title}
+              title={plan.title}
+              price={plan.price}
+              icon={iconMap[plan.icon as keyof typeof iconMap]}
+              buttonText={plan.buttonText}
+              isFeatured={plan.isFeatured}
+              features={plan.features}
+            />
+          ))}
         </div>
       </section>
     </div>
