@@ -5,6 +5,10 @@ export const REFRESH_TIMEOUT_MS = 10_000;
 export const TOKEN_ERROR_STATUSES = new Set([401, 403]);
 export const TOAST_AUTO_CLOSE_DURATION = 4000; // 4 seconds
 
+// Username check delays
+export const USERNAME_CHECK_DEBOUNCE_MS = 1500; // 1.5 seconds
+export const USERNAME_CHECK_DELAY_MS = 1000; // 1 second
+
 // API Endpoints
 export const API_ENDPOINTS = {
   AUTH: {

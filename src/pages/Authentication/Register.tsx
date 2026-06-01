@@ -106,6 +106,10 @@ const Register: React.FC = () => {
     }
   };
 
+
+
+  
+
   return (
     isOtpSent ? (
       <OTPVerification
