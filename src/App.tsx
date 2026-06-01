@@ -1,3 +1,4 @@
+import React from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
@@ -28,6 +29,11 @@ const LayoutWrapper = () => {
   const { isLoading } = useAuth();
   const location = useLocation();
   const isDashboard = location.pathname === '/dashboard';
+  
+  // Scroll to top on route change
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   
   if (isLoading) {
     return <LoadingSpinner />;
@@ -64,13 +70,25 @@ const router = createBrowserRouter([
       { path: '/terms', element: <Terms /> },
       { path: '/cookies', element: <Cookies /> },
       { path: '/pricing', element: <Pricing /> },
-      { path: '/checkout', element: <Checkout /> },
-      { path: '/payment-success', element: <PaymentSuccess /> },
       { path: '/docs', element: <Docs /> },
       { path: '*', element: <Notfound /> },
 
 
       // Protected Routes
+      {
+        path: '/checkout', element: (
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/payment-success', element: (
+          <ProtectedRoute>
+            <PaymentSuccess />
+          </ProtectedRoute>
+        )
+      },
       {
         path: '/dashboard', element: (
           <ProtectedRoute>

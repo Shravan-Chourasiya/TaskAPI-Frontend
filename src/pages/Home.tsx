@@ -5,7 +5,7 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section - The Precision Luminary Layout */}
-      <section className="pt-0 pb-16 px-6 max-w-7xl mx-auto">
+      <section className="pb-16 px-6 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1 space-y-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-primary text-xs font-bold tracking-widest uppercase">
@@ -136,18 +136,21 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Featured Card Module */}
+      {/* CTA Section */}
       <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="bg-surface-container-lowest p-12 rounded-3xl shadow-ambient relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
-          <div className="max-w-2xl space-y-6">
-            <h2 className="text-4xl font-extrabold text-on-surface">Built for the future.</h2>
-            <p className="text-lg text-secondary leading-relaxed">
-              Granular control with global revocation, device limits, and dynamic JWT claims for complex organizational needs. Precision infrastructure for developers who build the future.
-            </p>
-            <Link to="/features" className="flex items-center gap-2 font-bold text-primary transition-all duration-300 group">
-              Explore Enterprise Features
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+        <div className="bg-linear-to-br from-primary/10 via-surface-container-low to-primary/5 p-12 md:p-16 rounded-3xl shadow-ambient text-center space-y-6">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-on-surface -tracking-[0.02em]">
+            Ready to build the future?
+          </h2>
+          <p className="text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
+            Join thousands of developers who trust TaskAPI for their authentication infrastructure. Start building in minutes.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center pt-4">
+            <Link to="/register" className="bg-primary text-on-primary px-8 py-4 rounded-md font-bold hover:opacity-90 active:scale-95 transition-all shadow-lg">
+              Get Started Free
+            </Link>
+            <Link to="/pricing" className="bg-surface text-on-surface px-8 py-4 rounded-md font-bold hover:bg-surface-container transition-colors">
+              View Pricing
             </Link>
           </div>
         </div>

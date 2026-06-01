@@ -55,10 +55,27 @@
 
   body {
     @apply bg-surface text-on-surface font-body;
+    user-select: auto;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    -webkit-user-drag: none;
+    user-drag: none;
+  }
+  
+  img {
+    -webkit-user-drag: none;
+    user-drag: none;
+    pointer-events: auto;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline tracking-tight;
+  }
+
+  ::selection {
+    background-color: Highlight;
+    color: HighlightText;
   }
 
 /* Glassmorphism Utility */
