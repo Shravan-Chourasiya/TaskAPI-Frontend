@@ -5,7 +5,7 @@ import { Globe, Share2, Terminal } from 'lucide-react';
 const Footer = () => {
   return (
     <footer className="w-full bg-surface-container-low pt-16 pb-12 border-t border-outline-variant">
-      <div className="max-w-[1280px] mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-12 mb-16">
           <div className="md:col-span-2">
             <span className="font-extrabold text-xl text-primary mb-4 block">{APP_NAME}</span>

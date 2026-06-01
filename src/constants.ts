@@ -16,9 +16,10 @@ export const API_ENDPOINTS = {
     TOKEN_REFRESH: '/api/v1/auth/token/refresh',
     ACCOUNT_UPDATE: '/api/v1/auth/account/update',
     PROFILE_UPDATE: '/api/v1/auth/profile/update',
+    CHECK_USERNAME: '/api/v1/auth/check-username',
   },
   USER: {
-    IS_USER: '/api/v1/user/is-user',
+    IS_USER: '/api/v1/is-user',
   },
   SUBSCRIPTION: {
     CREATE_ORDER: '/api/v1/subscription/create-order',

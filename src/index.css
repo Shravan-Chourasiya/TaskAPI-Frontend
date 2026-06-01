@@ -55,17 +55,19 @@
 
   body {
     @apply bg-surface text-on-surface font-body;
-    user-select: auto;
     -webkit-user-select: auto;
     -moz-user-select: auto;
     -ms-user-select: auto;
+    user-select: auto;
+    /* webhint-disable compat-api/css */
     -webkit-user-drag: none;
-    user-drag: none;
+    /* webhint-enable compat-api/css */
   }
   
   img {
+    /* webhint-disable compat-api/css */
     -webkit-user-drag: none;
-    user-drag: none;
+    /* webhint-enable compat-api/css */
     pointer-events: auto;
   }
   
