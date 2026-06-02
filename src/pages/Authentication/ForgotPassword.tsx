@@ -180,7 +180,7 @@ const ForgotPassword: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient">
+          <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient border-2 border-outline-variant">
             <form onSubmit={handlePasswordReset} className="space-y-6">
               {error && (
                 <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl text-sm">
@@ -240,7 +240,7 @@ const ForgotPassword: React.FC = () => {
 
           <div className="mt-6 text-center">
             <Link to="/login" className="text-secondary text-sm hover:text-on-surface transition-colors">
-              ← Back to Login
+              ← <span className="underline">Back to Login</span>
             </Link>
           </div>
         </div>
@@ -264,7 +264,7 @@ const ForgotPassword: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient">
+        <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient border-2 border-outline-variant">
           <form onSubmit={handleEmailSubmit} className="space-y-6">
             {error && (
               <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl text-sm">
@@ -313,7 +313,7 @@ const ForgotPassword: React.FC = () => {
 
         <div className="mt-6 text-center">
           <Link to="/" className="text-secondary text-sm hover:text-on-surface transition-colors">
-            ← Back to Home
+            ← <span className="underline">Back to Home</span>
           </Link>
         </div>
       </div>

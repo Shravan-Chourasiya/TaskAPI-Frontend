@@ -4,7 +4,7 @@ import { APP_NAME } from '@/constants';
 const Navbar = () => {
     return (
         <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-200">
-            <nav className="bg-surface/60 dark:bg-inverse-surface/60 backdrop-blur-lg border border-outline/20 shadow-lg rounded-full px-8 py-3 flex items-center justify-between">
+            <nav className="bg-surface/60 dark:bg-inverse-surface/60 backdrop-blur-lg border-2 border-outline-variant shadow-lg rounded-full px-8 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-6">
                     <NavLink to='/' className="font-extrabold text-[22px] text-primary">
                         {APP_NAME}

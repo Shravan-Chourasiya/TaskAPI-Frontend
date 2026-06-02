@@ -36,7 +36,7 @@ const Login: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient">
+        <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient border-2 border-outline-variant">
           <form onSubmit={handleLogin} className="space-y-6">
 
             <div className="space-y-2">
@@ -103,7 +103,7 @@ const Login: React.FC = () => {
 
         <div className="mt-4 text-center">
           <Link to="/" className="text-secondary text-[16.1px] hover:text-on-surface transition-colors">
-            ← Back to Home
+            ← <span className="underline">Back to Home</span>
           </Link>
         </div>
       </div>
