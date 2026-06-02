@@ -108,7 +108,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [username, hasInteracted]);
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-10">
+        <div className="min-h-screen flex items-center justify-center px-6 pb-5">
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-primary text-xs font-bold tracking-widest uppercase mb-6">
@@ -123,7 +123,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     </p>
                 </div>
 
-                <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient">
+                <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient border-2 border-outline-variant">
                     <form onSubmit={onSubmit} className="space-y-6">
                         {error && (
                             <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl text-[13.8px]">
@@ -222,7 +222,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
                 <div className="mt-6 text-center">
                     <Link to="/" className="text-secondary text-[13.8px] hover:text-on-surface transition-colors">
-                        ← Back to Home
+                        ← <span className="underline">Back to Home</span>
                     </Link>
                 </div>
             </div>
