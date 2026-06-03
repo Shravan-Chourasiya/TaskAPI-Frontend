@@ -28,6 +28,14 @@ export const API_ENDPOINTS = {
   SUBSCRIPTION: {
     CREATE_ORDER: '/api/v1/subscription/create-order',
     VERIFY_PAYMENT: '/api/v1/subscription/verify-payment',
+  },
+  APIKEY: {
+    CREATE: '/api/v1/apikey/create/apikey',
+    LIST: '/api/v1/apikey/list',
+    REVOKE: '/api/v1/apikey/revoke',
+  },
+  STATS: {
+    DASHBOARD: '/api/v1/stats/dashboard',
   }
 };
 
