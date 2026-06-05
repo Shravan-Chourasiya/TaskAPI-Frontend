@@ -98,25 +98,40 @@ const ProfileForm = () => {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('firstName', firstName);
-      formData.append('lastName', lastName);
-      formData.append('bio', bio);
-      formData.append('country', country);
-      formData.append('city', city);
-      
+      // Use FormData only if file is uploaded, otherwise use JSON
       if (avatarType === 'upload' && avatarFile) {
+        const formData = new FormData();
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('bio', bio);
+        formData.append('country', country);
+        formData.append('city', city);
         formData.append('avatar', avatarFile);
-      } else if (avatarType === 'url' && avatarUrl) {
-        formData.append('avatarUrl', avatarUrl);
-      } else {
-        formData.append('avatarUrl', '');
-      }
 
-      const response = await apiInstance.patch(API_ENDPOINTS.AUTH.PROFILE_UPDATE, formData);
-      await store.refreshUser();
-      toast.success(response.data?.message || 'Profile updated successfully!');
-      navigate('/profile');
+        const response = await apiInstance.patch(API_ENDPOINTS.AUTH.PROFILE_UPDATE, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        await store.refreshUser();
+        toast.success(response.data?.message || 'Profile updated successfully!');
+        navigate('/profile');
+      } else {
+        // Use regular JSON payload
+        const payload = {
+          firstName,
+          lastName,
+          bio,
+          country,
+          city,
+          avatarUrl: avatarType === 'url' ? avatarUrl : ''
+        };
+
+        const response = await apiInstance.patch(API_ENDPOINTS.AUTH.PROFILE_UPDATE, payload);
+        await store.refreshUser();
+        toast.success(response.data?.message || 'Profile updated successfully!');
+        navigate('/profile');
+      }
     } catch (error: unknown) {
       toast.error((error as any).response?.data?.message || 'Failed to update profile. Please try again.');
       console.error('Error updating profile:', error);

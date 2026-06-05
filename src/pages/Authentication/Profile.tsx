@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Edit, Mail, MapPin, FileText, User as UserIcon } from 'lucide-react';
+import { Edit, Mail, MapPin, FileText, User as UserIcon, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import authStore from '@/lib/zustandStore';
 import { DICEBEAR_AVATAR_API } from '@/constants';
@@ -42,9 +42,19 @@ const Profile = () => {
     <div className="min-h-screen bg-surface py-12 px-6">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-extrabold text-on-surface -tracking-[0.02em]">
-            Profile
-          </h1>
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => navigate(-1)}
+              variant="ghost"
+              size="icon"
+              className="text-gray-600 hover:text-[#004e47]"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="text-4xl font-extrabold text-on-surface -tracking-[0.02em]">
+              My Profile
+            </h1>
+          </div>
           <Button
             onClick={() => navigate('/profile/edit')}
             size="lg"
