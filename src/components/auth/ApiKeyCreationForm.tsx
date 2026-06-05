@@ -66,8 +66,10 @@ const ApiKeyCreationForm = ({ onClose, onSuccess }: ApiKeyCreationFormProps) => 
         onSuccess();
         onClose();
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Failed to create API key';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error && 'response' in err 
+        ? (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to create API key'
+        : 'Failed to create API key';
       toast.error(errorMessage);
     } finally {
       setCreating(false);
@@ -159,12 +161,14 @@ const ApiKeyCreationForm = ({ onClose, onSuccess }: ApiKeyCreationFormProps) => 
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="environment-select">
               Environment *
             </label>
             <select
+              id="environment-select"
+              title="Select environment"
               value={formData.env}
-              onChange={(e) => setFormData({ ...formData, env: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, env: e.target.value as 'production' | 'development' | 'test' })}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004e47]"
               disabled={creating}
             >
