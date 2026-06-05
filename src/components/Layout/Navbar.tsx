@@ -10,7 +10,7 @@ const Navbar = () => {
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-white/80 backdrop-blur-md border-b border-gray-200">
-            <nav className="h-full max-w-[1400px] mx-auto px-6 flex items-center justify-between">
+            <nav className="h-full max-w-350 mx-auto px-6 flex items-center justify-between">
                 <div className="flex items-center gap-8">
                     <NavLink to='/' className="font-extrabold text-2xl text-[#004e47]">
                         {APP_NAME}

@@ -18,6 +18,7 @@ import Features from './pages/Business/Features';
 import { Privacy, Terms, Cookies } from './pages/Utility/Legal';
 import Notfound from './pages/Utility/Notfound';
 import Dashboard from './pages/Authentication/Dashboard';
+import ApiCredentials from './pages/Authentication/ApiCredentials';
 import { ProtectedRoute } from './utils/routesProtection';
 import { PublicRoute } from './utils/PublicRoute';
 import { useAuth } from './hooks/useAuth';
@@ -28,7 +29,7 @@ import LoadingSpinner from './components/ui/LoadingSpinner';
 const LayoutWrapper = () => {
   const { isLoading } = useAuth();
   const location = useLocation();
-  const isDashboard = location.pathname === '/dashboard';
+  const isDashboard = location.pathname === '/dashboard' || location.pathname === '/api-credentials';
   
   // Scroll to top on route change
   React.useEffect(() => {
@@ -93,6 +94,13 @@ const router = createBrowserRouter([
         path: '/dashboard', element: (
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/api-credentials', element: (
+          <ProtectedRoute>
+            <ApiCredentials />
           </ProtectedRoute>
         )
       },
