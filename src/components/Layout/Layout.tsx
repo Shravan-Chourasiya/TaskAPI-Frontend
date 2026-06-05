@@ -9,7 +9,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen selection:bg-primary/20 selection:text-primary bg-surface transition-colors duration-500">
       <Navbar />
-      <main className="grow pt-32">
+      <main className="grow pt-16">
         {children}
       </main>
       <Footer />
