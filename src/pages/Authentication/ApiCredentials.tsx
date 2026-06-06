@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import ApiKeyCreationForm from '@/components/auth/ApiKeyCreationForm';
 import { toast } from 'sonner';
+import { API_ENDPOINTS } from '@/constants';
 
 interface ApiKey {
   _id: string;
@@ -48,7 +49,8 @@ const ApiCredentials = () => {
   const fetchApiKeys = async () => {
     try {
       setLoading(true);
-      const response = await apiInstance.get('/api/v1/apikey/list');
+      setTimeout(() => {}, 1500);
+      const response = await apiInstance.get(API_ENDPOINTS.APIKEY.LIST);
       if (response.data?.data) {
         setApiKeys(response.data.data);
       }
@@ -69,7 +71,7 @@ const ApiCredentials = () => {
     if (!confirm('Are you sure you want to delete this API key?')) return;
     
     try {
-      await apiInstance.post(`/api/v1/apikey/revoke/${keyId}`);
+      await apiInstance.post(API_ENDPOINTS.APIKEY.REVOKE.replace(':id', keyId));
       toast.success('API key deleted successfully');
       fetchApiKeys();
     } catch (error) {
@@ -99,7 +101,7 @@ const ApiCredentials = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9ff] overflow-x-hidden">
+    <div className="min-h-screen bg-surface overflow-x-hidden">
       <aside className={`fixed left-0 top-0 h-screen bg-white shadow-lg transition-all duration-300 z-50 ${sidebarOpen ? 'w-72' : 'w-0'} overflow-hidden`}>
         <div className="flex flex-col h-full p-4">
           <div className="mb-10 px-4 flex justify-between items-center">
@@ -190,7 +192,7 @@ const ApiCredentials = () => {
       </header>
 
       <main className={`pt-16 min-h-screen transition-all duration-300 ${sidebarOpen ? 'ml-72' : 'ml-0'}`}>
-        <div className="max-w-[1280px] mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold mb-2">API Keys Management</h2>
