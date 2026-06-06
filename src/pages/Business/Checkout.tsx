@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, Shield, Lock, ArrowLeft } from 'lucide-react';
@@ -10,9 +9,34 @@ import { toast } from 'sonner';
 import { config } from '@/utils/config';
 import { RAZORPAY_SCRIPT_URL, APP_NAME, PRIMARY_COLOR, DEFAULT_PLAN, API_ENDPOINTS } from '@/constants';
 
+interface RazorpayResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayError {
+  error: {
+    code: string;
+    description: string;
+    source: string;
+    step: string;
+    reason: string;
+    metadata: {
+      order_id: string;
+      payment_id: string;
+    };
+  };
+}
+
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: {
+      new (options: unknown): {
+        open: () => void;
+        on: (event: string, handler: (response: RazorpayError) => void) => void;
+      };
+    };
   }
 }
 
@@ -22,19 +46,20 @@ interface PlanDetails {
   features: string[];
 }
 
-
 const Checkout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const selectedPlan = usePlanStore((state) => state.selectedPlan);
   const { isAuthenticated, user } = useAuth();
+  
   if (!user || !isAuthenticated) {
     toast.error('User not authenticated. Please login to continue.');
     navigate('/login');
     return null;
   }
-  const name = `${user.profile?.firstName} ${user.profile?.lastName}`
-  const authUser = { ...user, name: name || user.username }
+  
+  const name = `${user.profile?.firstName} ${user.profile?.lastName}`;
+  const authUser = { ...user, name: name || user.username };
 
   const planDetails: PlanDetails = selectedPlan || DEFAULT_PLAN;
 
@@ -48,7 +73,6 @@ const Checkout = () => {
     });
   };
 
-
   const handlePayment = async () => {
     if (!isAuthenticated) {
       toast.error('Please login to continue with payment');
@@ -58,22 +82,32 @@ const Checkout = () => {
 
     setLoading(true);
     try {
-      if (planDetails.name === 'Free ') {
-        const subscriptionPlanDetails = { planName: planDetails.name.trim(), autoRenewStatus: false, duration: 12, price: 0 };
-        await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.CREATE_ORDER, { subscriptionPlanDetails });
-        toast.success('Successfully subscribed to Free plan!');
+      const subscriptionPlanDetails = {
+        planName: planDetails.name.trim() as 'Free' | 'Basic' | 'Pro',
+        price: planDetails.price,
+        duration: 12,
+        autoRenewStatus: planDetails.name === 'Free' ? false : true
+      };
+
+      // Handle Free Plan
+      if (planDetails.name === 'Free') {
+        const response = await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.BUY, {
+          subscriptionPlanDetails
+        });
+        
+        toast.success(response.data?.message || 'Successfully subscribed to Free plan!');
         usePlanStore.getState().clearSelectedPlan();
         navigate('/payment-success', {
           state: {
             plan: planDetails.name,
-            amount: planDetails.price
+            amount: 0
           }
         });
         setLoading(false);
         return;
       }
 
-      // Load Razorpay script
+      // Load Razorpay script for paid plans
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         toast.error('Failed to load payment gateway. Please try again.');
@@ -81,56 +115,42 @@ const Checkout = () => {
         return;
       }
 
-      // Step 1: Create Order
-      const createOrderResponse = await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.CREATE_ORDER, {
-        subscriptionPlanDetails: {
-          planName: planDetails.name,
-          autoRenewStatus: true,
-          duration: 1,
-          price: planDetails.price
-        }
+      // Step 1: Buy subscription and get Razorpay order
+      const buyResponse = await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.BUY, {
+        subscriptionPlanDetails
       });
 
-      console.log('Create Order Response:', createOrderResponse);
-      if (!createOrderResponse.data || !createOrderResponse.data.razorpayOrder) {
+      if (!buyResponse.data?.data?.razorpayOrder) {
         throw new Error('Failed to create order');
       }
+
+      const { razorpayOrder } = buyResponse.data.data;
 
       // Step 2: Open Razorpay Payment UI
       const options = {
         key: config.RAZORPAY_KEY_ID,
-        amount: createOrderResponse.data.razorpayOrder.amount,
-        currency: createOrderResponse.data.razorpayOrder.currency,
-        order_id: createOrderResponse.data.razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        order_id: razorpayOrder.id,
         name: APP_NAME,
         description: `${planDetails.name} Plan Subscription`,
-        handler: async function (response: any) {
+        handler: async function (response: RazorpayResponse) {
           try {
-
             // Step 3: Verify Payment
-            console.log('Payment Response from Razorpay:::::', response);
-            console.log(`
-              transactionId:${response.razorpay_order_id},
-              razorPayID: ${response.razorpay_payment_id},
-              signature: ${response.razorpay_signature},
-              razorPayData: {
-              transactionId: ${createOrderResponse.data.razorpayOrder.receipt},
-            }`)
-            const verifyPaymentResponse = await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.VERIFY_PAYMENT, {
+            const verifyResponse = await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.VERIFY_PAYMENT, {
               transactionId: response.razorpay_order_id,
               razorPayID: response.razorpay_payment_id,
               signature: response.razorpay_signature,
               razorPayData: {
-                transactionId: createOrderResponse.data.razorpayOrder.receipt, // Pass the original transactionId (receipt) to the backend for verification
+                transactionId: razorpayOrder.receipt
               }
             });
 
-            if (!verifyPaymentResponse.data.success || !verifyPaymentResponse) {
-              toast.error('Payment verification failed. Please contact support.');
+            if (!verifyResponse.data?.success) {
+              throw new Error('Payment verification failed');
             }
 
-            toast.success(verifyPaymentResponse.data.message || 'Payment successful! Subscription activated.');
-
+            toast.success(verifyResponse.data.message || 'Payment successful! Subscription activated.');
             usePlanStore.getState().clearSelectedPlan();
 
             navigate('/payment-success', {
@@ -139,16 +159,8 @@ const Checkout = () => {
                 amount: planDetails.price
               }
             });
-
           } catch (error) {
-            console.error(`Payment verification failed.! || ${error} || 
-              ${response.error.code} ||
-              ${response.error.description} || 
-              ${response.error.source} || 
-              ${response.error.step} || 
-              ${response.error.reason} || 
-              ${response.error.metadata.order_id} || 
-              ${response.error.metadata.payment_id}`);
+            console.error('Payment verification failed:', error);
             toast.error('Payment verification failed. Please contact support.');
           }
         },
@@ -169,11 +181,19 @@ const Checkout = () => {
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response: RazorpayError) {
+        console.error('Payment failed:', response.error);
+        toast.error(`Payment failed: ${response.error.description}`);
+        setLoading(false);
+      });
       rzp.open();
       setLoading(false);
     } catch (error) {
       console.error('Payment error:', error);
-      toast.error((error as any).response?.data?.message || 'Failed to initiate payment. Please try again.');
+      const errorMessage = error instanceof Error && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+        : 'Failed to initiate payment. Please try again.';
+      toast.error(errorMessage || 'Failed to initiate payment. Please try again.');
       setLoading(false);
     }
   };
@@ -200,12 +220,12 @@ const Checkout = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-secondary font-medium">Billing Cycle</span>
-                <span className="text-on-surface font-bold">Monthly</span>
+                <span className="text-on-surface font-bold">12 Months</span>
               </div>
               <div className="h-px bg-outline-variant my-4"></div>
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold text-on-surface">Total</span>
-                <span className="text-2xl font-black text-primary">${planDetails.price}</span>
+                <span className="text-2xl font-black text-primary">₹{planDetails.price}</span>
               </div>
             </div>
 
@@ -248,12 +268,12 @@ const Checkout = () => {
                 disabled={loading}
                 className="w-full bg-primary text-on-primary py-4 rounded-2xl font-black text-lg shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Processing...' : `Pay $${planDetails.price}`}
+                {loading ? 'Processing...' : planDetails.price === 0 ? 'Activate Free Plan' : `Pay ₹${planDetails.price}`}
               </Button>
 
               <p className="text-xs text-secondary text-center">
                 By proceeding, you agree to our Terms of Service and Privacy Policy.
-                Your subscription will auto-renew monthly.
+                {planDetails.price > 0 && ' Your subscription will be valid for 12 months.'}
               </p>
             </div>
           </div>

@@ -26,13 +26,13 @@ export const API_ENDPOINTS = {
     IS_USER: '/api/v1/is-user',
   },
   SUBSCRIPTION: {
-    BUY: '/api/subscription/buy',
-    VERIFY_PAYMENT: '/api/subscription/verify-payment',
+    BUY: '/api/v1/subscription/create-order',
+    VERIFY_PAYMENT: '/api/v1/subscription/verify-payment',
   },
   APIKEY: {
-    CREATE: '/api/v1/apikey/create/apikey',
-    LIST: '/api/v1/apikey/list',
-    REVOKE: '/api/v1/apikey/revoke',
+    CREATE: '/api/v1/api-keys/create/apikey',
+    LIST: '/api/v1/api-keys/list/apikeys',
+    REVOKE: '/api/v1/api-keys/revoke',
   },
   STATS: {
     DASHBOARD: '/api/v1/stats/dashboard',
