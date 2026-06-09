@@ -20,7 +20,7 @@ export const API_ENDPOINTS = {
     TOKEN_REFRESH: '/api/v1/auth/token/refresh',
     ACCOUNT_UPDATE: '/api/v1/auth/account/update',
     PROFILE_UPDATE: '/api/v1/auth/profile/update',
-    CHECK_USERNAME: '/api/v1/auth/check-username',
+    CHECK_USERNAME: '/api/v1/check-username',
   },
   USER: {
     IS_USER: '/api/v1/is-user',
