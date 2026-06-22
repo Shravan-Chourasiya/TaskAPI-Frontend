@@ -6,8 +6,8 @@ export const TOKEN_ERROR_STATUSES = new Set([401, 403]);
 export const TOAST_AUTO_CLOSE_DURATION = 4000; // 4 seconds
 
 // Username check delays
-export const USERNAME_CHECK_DEBOUNCE_MS = 1500; // 1.5 seconds
-export const USERNAME_CHECK_DELAY_MS = 1000; // 1 second
+export const USERNAME_CHECK_DEBOUNCE_MS = 2000; // 2 seconds
+export const USERNAME_CHECK_DELAY_MS = 1500; // 1.5 seconds
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -32,7 +32,11 @@ export const API_ENDPOINTS = {
   APIKEY: {
     CREATE: '/api/v1/api-keys/create/apikey',
     LIST: '/api/v1/api-keys/list/apikeys',
-    REVOKE: '/api/v1/api-keys/revoke',
+    REVOKE: '/api/v1/api-keys/revoke/:id',
+    UPDATE_NAME:'/api/v1/api-keys/update/name',
+    UPDATE_SCOPES:'/api/v1/api-keys/update/scopes',
+    UPDATE_IPS:'/api/v1/api-keys/update/ips',
+    DELETE: '/api/v1/api-keys/delete/:id',
   },
   STATS: {
     DASHBOARD: '/api/v1/stats/dashboard',

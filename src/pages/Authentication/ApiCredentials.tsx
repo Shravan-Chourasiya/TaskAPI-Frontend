@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import authStore from '@/lib/zustandStore';
 import { apiInstance } from '@/lib/axiosInstance';
-import { Menu, PanelLeftClose, LayoutDashboard, Key, CreditCard, HelpCircle, LogOut, Zap, User, Copy, Pencil, Trash2, Shield, Globe } from 'lucide-react';
+import { Menu, PanelLeftClose, LayoutDashboard, Key, CreditCard, HelpCircle, LogOut, Zap, User, Pencil, Trash2, Shield, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import ApiKeyCreationForm from '@/components/auth/ApiKeyCreationForm';
+import ReusableForm from '@/components/ReusableForm';
 import { toast } from 'sonner';
 import { API_ENDPOINTS } from '@/constants';
 
@@ -24,6 +25,14 @@ interface ApiKey {
   usageCount: number;
 }
 
+interface UpdateFormState {
+  heading: string;
+  inputPlaceholder: string;
+  submitBtnText: string;
+  functionParams?: object;
+  functionToExecute: (inputValue: string, functionParams?: object) => void | Promise<void>;
+}
+
 const ApiCredentials = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,6 +41,7 @@ const ApiCredentials = () => {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [updateForm, setUpdateForm] = useState<UpdateFormState | null>(null);
 
   useEffect(() => {
     fetchApiKeys();
@@ -46,10 +56,14 @@ const ApiCredentials = () => {
     }
   }, [location]);
 
+  const closeApiUpdateForm = () => {
+    setUpdateForm(null);
+  };
+
   const fetchApiKeys = async () => {
     try {
       setLoading(true);
-      setTimeout(() => {}, 1500);
+      setTimeout(() => { }, 1500);
       const response = await apiInstance.get(API_ENDPOINTS.APIKEY.LIST);
       if (response.data?.data) {
         setApiKeys(response.data.data);
@@ -62,17 +76,33 @@ const ApiCredentials = () => {
     }
   };
 
-  const handleCopyKey = (key: string) => {
-    navigator.clipboard.writeText(key);
-    toast.success('API key copied to clipboard');
-  };
-
+  const openApiUpdateForm = (
+    heading: string,
+    inputPlaceholder: string,
+    submitBtnText: string,
+    functionParams: object,
+    functionToExecute: (inputValue: string, functionParams?: object) => void | Promise<void>
+  ) => {
+    setUpdateForm({
+      heading,
+      inputPlaceholder,
+      submitBtnText,
+      functionParams,
+      functionToExecute,
+    });
+  }
   const handleDelete = async (keyId: string) => {
     if (!confirm('Are you sure you want to delete this API key?')) return;
-    
+
     try {
-      await apiInstance.post(API_ENDPOINTS.APIKEY.REVOKE.replace(':id', keyId));
-      toast.success('API key deleted successfully');
+      const response = await apiInstance.post(API_ENDPOINTS.APIKEY.REVOKE.replace(':id', keyId));
+
+      if (response.data?.success) {
+        toast.success('API key deleted successfully');
+      } else {
+        toast.error('Failed to delete API key');
+      }
+
       fetchApiKeys();
     } catch (error) {
       console.error('Failed to delete API key:', error);
@@ -87,6 +117,34 @@ const ApiCredentials = () => {
       console.error('Logout failed:', error);
     }
   };
+
+
+  const handleUpdateApiName = async (newName: string, functionParams?: object) => {
+    try {
+      const keyId = functionParams && typeof functionParams === 'object' && 'id' in functionParams
+        ? String((functionParams as { id?: string }).id ?? '')
+        : '';
+
+      if (!keyId) {
+        toast.error('Missing API key identifier');
+        return;
+      }
+
+      const response = await apiInstance.patch(API_ENDPOINTS.APIKEY.UPDATE_NAME, { keyId, newName });
+
+      if (response.data?.success) {
+        toast.success('API key name updated successfully');
+        fetchApiKeys();
+        closeApiUpdateForm();
+      } else {
+        toast.error('Failed to update API key name');
+      }
+      fetchApiKeys();
+    } catch (error) {
+      console.error('Failed to update API key name:', error);
+      toast.error('Failed to update API key name');
+    }
+  }
 
   const getAvatarUrl = () => {
     return user?.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`;
@@ -167,8 +225,8 @@ const ApiCredentials = () => {
       <header className={`fixed top-0 right-0 h-16 z-40 bg-white/80 backdrop-blur-md flex items-center px-6 border-b border-gray-200 transition-all duration-300 ${sidebarOpen ? 'left-72' : 'left-0'}`}>
         <div className="flex items-center gap-4 justify-between w-full">
           <div className="flex items-center gap-4">
-            <Button 
-              onClick={() => setSidebarOpen(true)} 
+            <Button
+              onClick={() => setSidebarOpen(true)}
               variant="ghost"
               size="icon"
               className={`transition-all ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
@@ -249,45 +307,28 @@ const ApiCredentials = () => {
                           {formatDate(apiKey.createdAt)}
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            apiKey.environment === 'production' 
-                              ? 'bg-red-100 text-red-800' 
-                              : 'bg-blue-100 text-blue-800'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${apiKey.environment === 'production'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-blue-100 text-blue-800'
+                            }`}>
                             {apiKey.environment}
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            apiKey.keyStatus === 'active' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${apiKey.keyStatus === 'active'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                            }`}>
                             {apiKey.keyStatus}
                           </span>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  onClick={() => handleCopyKey(`${apiKey.keyPrefix}••••${apiKey.keyHint}`)}
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-gray-600 hover:text-[#004e47]"
-                                >
-                                  <Copy className="w-4 h-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Copy API Key</p>
-                              </TooltipContent>
-                            </Tooltip>
 
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
-                                  onClick={() => console.log('Rename', apiKey._id)}
+                                  onClick={() => openApiUpdateForm("Renaming API Key", "Enter new name for the API...", "Update Name", { id: apiKey._id }, handleUpdateApiName)}
                                   variant="ghost"
                                   size="icon"
                                   className="h-8 w-8 text-gray-600 hover:text-blue-600"
@@ -358,6 +399,24 @@ const ApiCredentials = () => {
           )}
         </div>
       </main>
+
+      {updateForm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
+          onClick={closeApiUpdateForm}
+        >
+          <div onClick={(event) => event.stopPropagation()}>
+            <ReusableForm
+              heading={updateForm.heading}
+              inputPlaceholder={updateForm.inputPlaceholder}
+              submitBtnText={updateForm.submitBtnText}
+              functionParams={updateForm.functionParams}
+              functionToExecute={updateForm.functionToExecute}
+              onCancel={closeApiUpdateForm}
+            />
+          </div>
+        </div>
+      )}
 
       {showCreateForm && (
         <ApiKeyCreationForm
