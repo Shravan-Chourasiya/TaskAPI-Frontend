@@ -126,9 +126,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient border-2 border-outline-variant">
                     <form onSubmit={onSubmit} className="space-y-6">
                         {error && (
-                            <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl text-[13.8px]">
-                                {error}
-                            </div>
+                           toast.error(error)
                         )}
 
                         <div className="space-y-2">

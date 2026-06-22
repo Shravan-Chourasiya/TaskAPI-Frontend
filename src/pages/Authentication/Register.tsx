@@ -5,6 +5,7 @@ import { config } from '@/utils/config';
 import RegisterForm from '../../components/auth/RegisterForm';
 import OTPVerification from '../../components/auth/OTPVerification';
 import { OTP_LENGTH, API_ENDPOINTS } from '../../constants';
+import { toast } from 'sonner';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -37,14 +38,15 @@ const Register: React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
-      await axios.post(
+      const response = await axios.post(
         `${config.SERVER_URL}${API_ENDPOINTS.AUTH.REGISTER}`,
         { username, email, password },
       );
-      setError('');
+      if (response.status === 201) {
+        toast.success('Registration successful. Please check your email for verification.');
+      }
       setOtp('');
       setOtpSuccess(false);
       setIsOtpSent(true);
@@ -52,10 +54,17 @@ const Register: React.FC = () => {
     } catch (err: any) {
       // Check if user is already registered but not verified
       const isRegisteredButNotVerified = err.response?.data?.isRegisteredButNotVerified || err.response?.data?.data?.isRegisteredButNotVerified;
+
       if (isRegisteredButNotVerified) {
         setIsOtpSent(true);
       }
+      if (err.response?.data?.message.includes("Zod Validation failed")) {
+
+        setError("Username Or Password does not meet the requirements. Please check and try again.");
+        toast.error("Username Or Password does not meet the requirements. Please check and try again.");
+      }
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -66,6 +75,7 @@ const Register: React.FC = () => {
     const normalizedOtp = otp.replace(/\D/g, '');
     if (normalizedOtp.length !== OTP_LENGTH) {
       setError('Please enter the full 6-digit OTP.');
+      toast.error('Please enter the full 6-digit OTP.');
       return;
     }
 
@@ -82,6 +92,7 @@ const Register: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.message || 'Account verification failed. Please try again.');
+      toast.error(err.response?.data?.message || 'Account verification failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -103,12 +114,13 @@ const Register: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to resend OTP. Please try again.');
+      toast.error(err.response?.data?.message || 'Failed to resend OTP. Please try again.');
     }
   };
 
 
 
-  
+
 
   return (
     isOtpSent ? (
