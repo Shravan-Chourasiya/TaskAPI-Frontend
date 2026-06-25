@@ -138,12 +138,9 @@ const Checkout = () => {
           try {
             // Step 3: Verify Payment
             const verifyResponse = await apiInstance.post(API_ENDPOINTS.SUBSCRIPTION.VERIFY_PAYMENT, {
-              transactionId: response.razorpay_order_id,
-              razorPayID: response.razorpay_payment_id,
-              signature: response.razorpay_signature,
-              razorPayData: {
-                transactionId: razorpayOrder.receipt
-              }
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
             });
 
             if (!verifyResponse.data?.success) {
