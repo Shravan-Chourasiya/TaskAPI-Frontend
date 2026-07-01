@@ -22,6 +22,8 @@ export const usePlanStore = create<PlanStore>()(
 		}),
 		{
 			name: "plan-storage",
+			version: 2, // bump to clear stale persisted plan data with old string prices
+			migrate: () => ({ selectedPlan: null }),
 		},
 	),
 );

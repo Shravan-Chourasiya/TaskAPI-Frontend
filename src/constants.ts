@@ -68,11 +68,19 @@ export const PRIMARY_COLOR = '#00685f';
 // Timeouts
 export const COPIED_FEEDBACK_DURATION = 2000; // 2 seconds
 
-// Subscription plans
+// Subscription plans — single source of truth matching backend SUBSCRIPTION_PLANS
+export const SUBSCRIPTION_PLANS = {
+  Free:  { price: 0,  duration: 12, autoRenew: false },
+  Basic: { price: 5,  duration: 12, autoRenew: true  },
+  Pro:   { price: 15, duration: 12, autoRenew: true  },
+} as const;
+
+export type PlanName = keyof typeof SUBSCRIPTION_PLANS;
+
 export const PRICING_PLANS = [
   {
-    title: 'Free',
-    price: '$0',
+    title: 'Free' as PlanName,
+    price: SUBSCRIPTION_PLANS.Free.price,
     icon: 'Key',
     buttonText: 'Get Started',
     isFeatured: false,
@@ -83,8 +91,8 @@ export const PRICING_PLANS = [
     ]
   },
   {
-    title: 'Basic',
-    price: '$5',
+    title: 'Basic' as PlanName,
+    price: SUBSCRIPTION_PLANS.Basic.price,
     icon: 'RefreshCw',
     buttonText: 'Buy Now',
     isFeatured: false,
@@ -96,8 +104,8 @@ export const PRICING_PLANS = [
     ]
   },
   {
-    title: 'Pro',
-    price: '$15',
+    title: 'Pro' as PlanName,
+    price: SUBSCRIPTION_PLANS.Pro.price,
     icon: 'Zap',
     buttonText: 'Buy Pro Now',
     isFeatured: true,
@@ -112,16 +120,9 @@ export const PRICING_PLANS = [
 ];
 
 export const DEFAULT_PLAN = {
-  name: 'Basic',
-  price: 5,
-  features: [
-    'Up to 10,000 MAU',
-    'Passkey Support',
-    'OAuth Providers',
-    'Email Support',
-    'Standard Infrastructure',
-    'Basic Analytics'
-  ]
+  name: 'Basic' as PlanName,
+  price: SUBSCRIPTION_PLANS.Basic.price,
+  features: PRICING_PLANS.find(p => p.title === 'Basic')?.features ?? [],
 };
 
 // Mock data (to be replaced with backend)
