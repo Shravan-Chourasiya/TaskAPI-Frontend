@@ -7,7 +7,7 @@ import { apiInstance } from '@/lib/axiosInstance';
 import { usePlanStore } from '@/lib/planStore';
 import { toast } from 'sonner';
 import { config } from '@/utils/config';
-import { RAZORPAY_SCRIPT_URL, APP_NAME, PRIMARY_COLOR, DEFAULT_PLAN, API_ENDPOINTS } from '@/constants';
+import { RAZORPAY_SCRIPT_URL, APP_NAME, PRIMARY_COLOR, DEFAULT_PLAN, API_ENDPOINTS, SUBSCRIPTION_PLANS, type PlanName } from '@/constants';
 
 interface RazorpayResponse {
   razorpay_order_id: string;
@@ -82,11 +82,19 @@ const Checkout = () => {
 
     setLoading(true);
     try {
+      const planName = planDetails.name as PlanName;
+      const planConfig = SUBSCRIPTION_PLANS[planName];
+
+      if (!planConfig) {
+        toast.error('Invalid plan selected. Please go back and select a plan.');
+        setLoading(false);
+        return;
+      }
       const subscriptionPlanDetails = {
-        planName: planDetails.name.trim() as 'Free' | 'Basic' | 'Pro',
-        price: planDetails.price,
-        duration: 12,
-        autoRenewStatus: planDetails.name === 'Free' ? false : true
+        planName,
+        price: planConfig.price,
+        duration: planConfig.duration,
+        autoRenewStatus: planConfig.autoRenew,
       };
 
       // Handle Free Plan
@@ -187,10 +195,11 @@ const Checkout = () => {
       setLoading(false);
     } catch (error) {
       console.error('Payment error:', error);
-      const errorMessage = error instanceof Error && 'response' in error
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
-        : 'Failed to initiate payment. Please try again.';
-      toast.error(errorMessage || 'Failed to initiate payment. Please try again.');
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        (error instanceof Error ? error.message : null) ??
+        'Failed to initiate payment. Please try again.';
+      toast.error(errorMessage);
       setLoading(false);
     }
   };

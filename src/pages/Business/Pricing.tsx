@@ -2,13 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { Check, Key, RefreshCw, Zap } from 'lucide-react';
 import React from 'react';
 import { usePlanStore } from '@/lib/planStore';
-import { PRICING_PLANS } from '@/constants';
+import { PRICING_PLANS, SUBSCRIPTION_PLANS, type PlanName } from '@/constants';
 
 
 
 type PricingCardType = {
-  title: string,
-  price: string,
+  title: PlanName,
+  price: number,
   features: string[],
   icon: React.ElementType,
   isFeatured?: boolean,
@@ -34,7 +34,7 @@ const PricingCard = ({
   const setSelectedPlan = usePlanStore((state) => state.setSelectedPlan);
 
   const handleSelectPlan = () => {
-    setSelectedPlan({ name: title, price: parseFloat(price.replace('$', '')), features });
+    setSelectedPlan({ name: title, price, features });
     navigate('/checkout');
   };
 
@@ -54,7 +54,7 @@ const PricingCard = ({
         <h3 className="text-2xl font-bold">{title}</h3>
       </div>
       <div className={`text-[32px] font-mono text-on-surface leading-none ${isFeatured ? 'mr-8' : ''}`}>
-        {price}<span className="text-base font-normal text-on-surface-variant">/mo</span>
+        ₹{price}<span className="text-base font-normal text-on-surface-variant">/mo</span>
       </div>
     </div>
     
