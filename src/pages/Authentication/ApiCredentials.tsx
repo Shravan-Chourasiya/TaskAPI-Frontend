@@ -102,11 +102,11 @@ const ApiCredentials = () => {
       } else {
         toast.error('Failed to delete API key');
       }
-
-      fetchApiKeys();
     } catch (error) {
       console.error('Failed to delete API key:', error);
       toast.error('Failed to delete API key');
+    } finally {
+      fetchApiKeys();
     }
   };
 
@@ -134,15 +134,15 @@ const ApiCredentials = () => {
 
       if (response.data?.success) {
         toast.success('API key name updated successfully');
-        fetchApiKeys();
         closeApiUpdateForm();
       } else {
         toast.error('Failed to update API key name');
       }
-      fetchApiKeys();
     } catch (error) {
       console.error('Failed to update API key name:', error);
       toast.error('Failed to update API key name');
+    } finally {
+      fetchApiKeys();
     }
   }
 
