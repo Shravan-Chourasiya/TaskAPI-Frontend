@@ -11,36 +11,37 @@ export const USERNAME_CHECK_DELAY_MS = 1500; // 1.5 seconds
 
 // API Endpoints
 export const API_ENDPOINTS = {
-  AUTH: {
-    LOGIN: '/api/v1/auth/login',
-    REGISTER: '/api/v1/auth/register',
-    LOGOUT: '/api/v1/auth/logout',
-    VERIFY: '/api/v1/auth/verify',
-    RESEND_OTP: '/api/v1/auth/resend-otp',
-    TOKEN_REFRESH: '/api/v1/auth/token/refresh',
-    ACCOUNT_UPDATE: '/api/v1/auth/account/update',
-    PROFILE_UPDATE: '/api/v1/auth/profile/update',
-    CHECK_USERNAME: '/api/v1/check-username',
-  },
-  USER: {
-    IS_USER: '/api/v1/is-user',
-  },
-  SUBSCRIPTION: {
-    BUY: '/api/v1/subscription/create-order',
-    VERIFY_PAYMENT: '/api/v1/subscription/verify-payment',
-  },
-  APIKEY: {
-    CREATE: '/api/v1/api-keys/create/apikey',
-    LIST: '/api/v1/api-keys/list/apikeys',
-    REVOKE: '/api/v1/api-keys/revoke/:id',
-    UPDATE_NAME:'/api/v1/api-keys/update/name',
-    UPDATE_SCOPES:'/api/v1/api-keys/update/scopes',
-    UPDATE_IPS:'/api/v1/api-keys/update/ips',
-    DELETE: '/api/v1/api-keys/delete/:id',
-  },
-  STATS: {
-    DASHBOARD: '/api/v1/stats/dashboard',
-  }
+	AUTH: {
+		LOGIN: "/api/v1/auth/login",
+		REGISTER: "/api/v1/auth/register",
+		LOGOUT: "/api/v1/auth/logout",
+		VERIFY: "/api/v1/auth/verify",
+		RESEND_OTP: "/api/v1/auth/resend-otp",
+		TOKEN_REFRESH: "/api/v1/auth/token/refresh",
+		ACCOUNT_UPDATE: "/api/v1/auth/account/update",
+		PROFILE_UPDATE: "/api/v1/auth/profile/update",
+		CHECK_USERNAME: "/api/v1/check-username",
+	},
+	USER: {
+		IS_USER: "/api/v1/is-user",
+	},
+	SUBSCRIPTION: {
+		BUY: "/api/v1/subscription/create-order",
+		VERIFY_PAYMENT: "/api/v1/subscription/verify-payment",
+	},
+	APIKEY: {
+		CREATE: "/api/v1/api-keys/create/apikey",
+		LIST: "/api/v1/api-keys/list/apikeys",
+		REVOKE: "/api/v1/api-keys/revoke/:id",
+		UPDATE_NAME: "/api/v1/api-keys/update/name",
+		UPDATE_SCOPES: "/api/v1/api-keys/update/scopes",
+		UPDATE_IPS: "/api/v1/api-keys/update/ips",
+		DELETE: "/api/v1/api-keys/delete/:id",
+	},
+	STATS: {
+		DASHBOARD: "/api/v1/dashboard/client/all-apis",
+		DASHBOARD_KEY: "/api/v1/dashboard/client/all-apis", // append /:apikeyid at call site
+	},
 };
 
 // Username validation
