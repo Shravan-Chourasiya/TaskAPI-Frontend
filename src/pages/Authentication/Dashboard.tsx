@@ -6,6 +6,7 @@ import { Menu, PanelLeftClose, LayoutDashboard, Key, CreditCard, HelpCircle, Log
 import { Button } from '@/components/ui/button';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import ApiKeyCreationForm from '@/components/auth/ApiKeyCreationForm';
+import { API_ENDPOINTS } from '@/constants';
 
 interface ApiKey {
   _id: string;
@@ -21,6 +22,34 @@ interface ApiKey {
   usageCount: number;
 }
 
+interface RollupBucket {
+  bucketStart: string;
+  successCount: number;
+  errorCount: number;
+  successDurationSum: number;
+  errorDurationSum: number;
+  minDuration: number;
+  maxDuration: number;
+}
+
+type RangePreset = '1h' | '6h' | '24h' | '2d' | '7d' | '30d';
+
+const RANGE_PRESETS: { label: string; value: RangePreset; ms: number }[] = [
+  { label: '1H',  value: '1h',  ms: 60 * 60 * 1000 },
+  { label: '6H',  value: '6h',  ms: 6 * 60 * 60 * 1000 },
+  { label: '24H', value: '24h', ms: 24 * 60 * 60 * 1000 },
+  { label: '2D',  value: '2d',  ms: 2 * 24 * 60 * 60 * 1000 },
+  { label: '7D',  value: '7d',  ms: 7 * 24 * 60 * 60 * 1000 },
+  { label: '30D', value: '30d', ms: 30 * 24 * 60 * 60 * 1000 },
+];
+
+function getRangeParams(preset: RangePreset) {
+  const to = new Date();
+  const ms = RANGE_PRESETS.find(p => p.value === preset)!.ms;
+  const from = new Date(to.getTime() - ms);
+  return { from: from.toISOString(), to: to.toISOString() };
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = authStore();
@@ -29,43 +58,58 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [responseFilter, setResponseFilter] = useState<'all' | 'success' | 'error'>('all');
-  const [stats, setStats] = useState({
-    apiRequests: 0,
-    activeSessions: 0,
-    avgLatency: 0,
-    successCount: 0,
-    failedCount: 0
-  });
-  const [usageData, setUsageData] = useState<Array<{ day: string; requests: number }>>([]);
-  const [responseTimeData, setResponseTimeData] = useState<Array<{ time: string; success: number; error: number }>>([]);
+  const [rangePreset, setRangePreset] = useState<RangePreset>('24h');
+  const [selectedApiKeyId, setSelectedApiKeyId] = useState<string | null>(null);
+  const [tier, setTier] = useState<string>('');
+  const [buckets, setBuckets] = useState<RollupBucket[]>([]);
+
+  const stats = {
+    successCount: buckets.reduce((s, b) => s + b.successCount, 0),
+    failedCount:  buckets.reduce((s, b) => s + b.errorCount, 0),
+    avgLatency: buckets.length
+      ? Math.round(
+          buckets.reduce((s, b) => s + b.successDurationSum + b.errorDurationSum, 0) /
+          buckets.reduce((s, b) => s + b.successCount + b.errorCount, 0) || 0
+        )
+      : 0,
+  };
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchApiKeys();
   }, []);
 
-  const fetchDashboardData = async () => {
+  useEffect(() => {
+    fetchMetrics();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rangePreset, selectedApiKeyId]);
+
+  const fetchApiKeys = async () => {
+    try {
+      const res = await apiInstance.get(API_ENDPOINTS.APIKEY.LIST);
+      if (res.data?.data) setApiKeys(res.data.data);
+    } catch (err) {
+      console.error('Failed to fetch API keys:', err);
+    }
+  };
+
+  const fetchMetrics = async () => {
     try {
       setLoading(true);
-      const keysResponse = await apiInstance.get('/api/v1/apikey/list');
-      if (keysResponse.data?.data) {
-        setApiKeys(keysResponse.data.data);
-      }
+      const { from, to } = getRangeParams(rangePreset);
+      const params = { from, to };
 
-      const statsResponse = await apiInstance.get('/api/v1/stats/dashboard');
-      if (statsResponse.data?.data) {
-        const data = statsResponse.data.data;
-        setStats({
-          apiRequests: data.apiRequests || 0,
-          activeSessions: data.activeSessions || 0,
-          avgLatency: data.avgLatency || 0,
-          successCount: data.successCount || 0,
-          failedCount: data.failedCount || 0
-        });
-        if (data.usageData) setUsageData(data.usageData);
-        if (data.responseTimeData) setResponseTimeData(data.responseTimeData);
+      const url = selectedApiKeyId
+        ? `${API_ENDPOINTS.STATS.DASHBOARD}/${selectedApiKeyId}`
+        : API_ENDPOINTS.STATS.DASHBOARD;
+
+      const res = await apiInstance.get(url, { params });
+      if (res.data?.data) {
+        setBuckets(res.data.data.buckets ?? []);
+        setTier(res.data.data.tier ?? '');
       }
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
+    } catch (err) {
+      console.error('Failed to fetch metrics:', err);
+      setBuckets([]);
     } finally {
       setLoading(false);
     }
@@ -79,23 +123,28 @@ const Dashboard = () => {
     }
   };
 
+  // Derive chart data from rollup buckets
+  const usageData = buckets.map(b => ({
+    day: new Date(b.bucketStart).toLocaleString(),
+    requests: b.successCount + b.errorCount,
+  }));
 
-
-  const getFilteredResponseTimeData = () => {
-    if (responseFilter === 'success') {
-      return responseTimeData.map(d => ({ time: d.time, success: d.success }));
-    } else if (responseFilter === 'error') {
-      return responseTimeData.map(d => ({ time: d.time, error: d.error }));
-    }
-    return responseTimeData;
-  };
+  const responseTimeData = buckets.map(b => {
+    const totalSuccess = b.successCount || 1;
+    const totalError = b.errorCount || 1;
+    return {
+      time: new Date(b.bucketStart).toLocaleString(),
+      success: Math.round(b.successDurationSum / totalSuccess),
+      error: Math.round(b.errorDurationSum / totalError),
+    };
+  });
 
   const getAvatarUrl = () => {
     return user?.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`;
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9ff] overflow-x-hidden">
+    <div className="min-h-screen bg-surface overflow-x-hidden">
       <aside className={`fixed left-0 top-0 h-screen bg-white shadow-lg transition-all duration-300 z-50 ${sidebarOpen ? 'w-72' : 'w-0'} overflow-hidden`}>
         <div className="flex flex-col h-full p-4">
           <div className="mb-10 px-4 flex justify-between items-center">
@@ -186,7 +235,7 @@ const Dashboard = () => {
       </header>
 
       <main className={`pt-16 min-h-screen transition-all duration-300 ${sidebarOpen ? 'ml-72' : 'ml-0'}`}>
-        <div className="max-w-[1280px] mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-8">
           <section className="mb-20 flex items-start justify-between gap-8">
             <div className="flex-1">
               <h2 className="text-4xl font-bold mb-2">Welcome back, {user?.username}</h2>
@@ -204,6 +253,38 @@ const Dashboard = () => {
           </section>
 
           <section className="mb-20">
+            {/* Controls: range presets + API key selector */}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <div className="flex gap-1 bg-white rounded-lg shadow p-1">
+                {RANGE_PRESETS.map(p => (
+                  <Button
+                    key={p.value}
+                    onClick={() => setRangePreset(p.value)}
+                    variant={rangePreset === p.value ? 'default' : 'ghost'}
+                    size="sm"
+                    className={rangePreset === p.value ? 'bg-[#004e47] hover:bg-[#004e47]/90' : ''}
+                  >
+                    {p.label}
+                  </Button>
+                ))}
+              </div>
+              <select
+                className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm shadow"
+                value={selectedApiKeyId ?? ''}
+                onChange={e => setSelectedApiKeyId(e.target.value || null)}
+              >
+                <option value="">All API Keys</option>
+                {apiKeys.map(k => (
+                  <option key={k._id} value={k._id}>{k.name} ({k.keyPrefix}…)</option>
+                ))}
+              </select>
+              {tier && (
+                <span className="text-xs text-gray-500 bg-white px-3 py-2 rounded-lg shadow">
+                  Rollup tier: <strong>{tier}</strong>
+                </span>
+              )}
+              {loading && <span className="text-xs text-gray-400">Loading…</span>}
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               <div className="bg-white p-8 rounded-lg shadow">
                 <div className="flex items-center justify-between mb-6">
@@ -276,7 +357,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={responseTimeData.length > 0 ? getFilteredResponseTimeData() : [{ time: '00:00', success: 0, error: 0 }]}>
+                  <BarChart data={responseTimeData.length > 0 ? (responseFilter === 'success' ? responseTimeData.map(d => ({ time: d.time, success: d.success })) : responseFilter === 'error' ? responseTimeData.map(d => ({ time: d.time, error: d.error })) : responseTimeData) : [{ time: '00:00', success: 0, error: 0 }]}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis 
                       type="category"
@@ -351,12 +432,12 @@ const Dashboard = () => {
         </div>
       </main>
 
-      <div className="fixed bottom-0 right-0 w-[500px] h-[500px] bg-[#004e47]/5 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+      <div className="fixed bottom-0 right-0 w-125 h-125 bg-[#004e47]/5 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
 
       {showCreateForm && (
         <ApiKeyCreationForm
           onClose={() => setShowCreateForm(false)}
-          onSuccess={fetchDashboardData}
+          onSuccess={() => { fetchApiKeys(); fetchMetrics(); }}
         />
       )}
     </div>
