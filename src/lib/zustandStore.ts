@@ -1,37 +1,10 @@
+import { persist } from "zustand/middleware";
 import { create } from "zustand";
 import { apiInstance } from "./axiosInstance";
 import { API_ENDPOINTS } from "@/constants";
+import type { AuthStore, PlanStore, User } from "./zustandStore.type";
 
-type User = {
-	email: string;
-	username: string;
-	status: string;
-	role: string[];
-	profile?: {
-		firstName?: string;
-		lastName?: string;
-		bio?: string;
-		avatarUrl?: string;
-		country?: string;
-		city?: string;
-	};
-	phone?: string;
-};
-
-type AuthStore = {
-	isAuthenticated: boolean;
-	user: User | null;
-	isLoading: boolean;
-	login: (email: string, password: string) => Promise<void>;
-	logout: () => Promise<void>;
-	refreshUser: () => Promise<void>;
-	checkAuth: () => Promise<void>;
-	setLoading: (loading: boolean) => void;
-	setUser: (user: User | null) => void;
-	setAuthenticated: (authenticated: boolean) => void;
-};
-
-const authStore = create<AuthStore>((set) => ({
+export const authStore = create<AuthStore>((set) => ({
 	isAuthenticated: false,
 	user: null,
 	isLoading: true,
@@ -129,6 +102,19 @@ const authStore = create<AuthStore>((set) => ({
 	setUser: (user: User | null) => set({ user }),
 }));
 
-export default authStore;
 
 
+export const usePlanStore = create<PlanStore>()(
+	persist(
+		(set) => ({
+			selectedPlan: null,
+			setSelectedPlan: (plan) => set({ selectedPlan: plan }),
+			clearSelectedPlan: () => set({ selectedPlan: null }),
+		}),
+		{
+			name: "plan-storage",
+			version: 2, // bump to clear stale persisted plan data with old string prices
+			migrate: () => ({ selectedPlan: null }),
+		},
+	),
+);
