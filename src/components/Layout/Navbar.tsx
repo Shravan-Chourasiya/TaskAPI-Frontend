@@ -1,11 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { APP_NAME, DICEBEAR_AVATAR_API } from '@/constants';
+import { APP_NAME } from '@/constants';
 import { authStore } from '@/lib/zustandStore';
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated } = authStore();
-    const avatarUrl = user?.profile?.avatarUrl || `${DICEBEAR_AVATAR_API}?seed=${user?.username || 'default'}`;
+    const { user, isAuthenticated, getAvatarUrl } = authStore();
+    const avatarUrl = getAvatarUrl();
     const hasProfile = user?.profile && (user.profile.firstName || user.profile.lastName || user.profile.bio);
 
     return (

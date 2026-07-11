@@ -42,6 +42,7 @@ const ApiCredentials = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [updateForm, setUpdateForm] = useState<UpdateFormState | null>(null);
+  const avatarUrl = authStore((state) => state.getAvatarUrl());
 
   useEffect(() => {
     fetchApiKeys();
@@ -146,10 +147,6 @@ const ApiCredentials = () => {
     }
   }
 
-  const getAvatarUrl = () => {
-    return user?.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`;
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -171,7 +168,7 @@ const ApiCredentials = () => {
 
           <div className="px-4 mb-10">
             <div className="flex items-center gap-4 mb-4">
-              <img src={getAvatarUrl()} alt={user?.username} className="w-12 h-12 rounded-full ring-2 ring-[#004e47]/10" />
+              <img src={avatarUrl} alt={user?.username} className="w-12 h-12 rounded-full ring-2 ring-[#004e47]/10" />
               <div className="flex flex-col">
                 <span className="font-bold">{user?.username || 'User'}</span>
                 <span className="text-xs text-gray-500">{user?.email}</span>

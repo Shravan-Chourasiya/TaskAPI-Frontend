@@ -25,16 +25,17 @@ export type AuthStore = {
 	setLoading: (loading: boolean) => void;
 	setUser: (user: User | null) => void;
 	setAuthenticated: (authenticated: boolean) => void;
+	getAvatarUrl: () => string;
 };
 
 export interface PlanFeatures {
-    name: string;
-    price: number;
-    features: string[];
+	name: string;
+	price: number;
+	features: string[];
 }
 
 export interface PlanStore {
-    selectedPlan: PlanFeatures | null;
-    setSelectedPlan: (plan: PlanFeatures) => void;
-    clearSelectedPlan: () => void;
+	selectedPlan: PlanFeatures | null;
+	setSelectedPlan: (plan: PlanFeatures) => void;
+	clearSelectedPlan: () => void;
 }

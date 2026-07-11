@@ -52,7 +52,7 @@ function getRangeParams(preset: RangePreset) {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, logout } = authStore();
+  const { user, logout, getAvatarUrl } = authStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -138,10 +138,6 @@ const Dashboard = () => {
       error: Math.round(b.errorDurationSum / totalError),
     };
   });
-
-  const getAvatarUrl = () => {
-    return user?.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`;
-  };
 
   return (
     <div className="min-h-screen bg-surface overflow-x-hidden">
@@ -236,7 +232,7 @@ const Dashboard = () => {
 
       <main className={`pt-16 min-h-screen transition-all duration-300 ${sidebarOpen ? 'ml-72' : 'ml-0'}`}>
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <section className="mb-20 flex items-start justify-between gap-8">
+          <section className="mb-5 flex items-start justify-between gap-8">
             <div className="flex-1">
               <h2 className="text-4xl font-bold mb-2">Welcome back, {user?.username}</h2>
               {user?.profile?.bio && (

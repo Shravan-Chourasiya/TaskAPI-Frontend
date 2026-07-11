@@ -3,7 +3,6 @@ import { Key, LogOut, X, Edit, Plus, Eye, EyeOff, Copy, Check, Download } from '
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/lib/zustandStore';
 import { Button } from '../ui/button';
-import { DICEBEAR_AVATAR_API } from '@/constants';
 import { useState } from 'react';
 
 interface ProfileSidebarProps {
@@ -29,7 +28,7 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
     const store = authStore();
     const user = store.user;
 
-    const avatarUrl = user?.profile?.avatarUrl || `${DICEBEAR_AVATAR_API}?seed=${user?.username || 'default'}`;
+    const avatarUrl = store.getAvatarUrl();
 
     const handlePermissionChange = (perm: keyof typeof permissions) => {
         if (perm === 'all') {

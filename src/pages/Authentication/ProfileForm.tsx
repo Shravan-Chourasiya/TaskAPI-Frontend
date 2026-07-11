@@ -5,7 +5,7 @@ import { apiInstance } from '@/lib/axiosInstance';
 import { authStore } from '@/lib/zustandStore';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { USERNAME_REGEX, BIO_MAX_LENGTH, DICEBEAR_AVATAR_API, API_ENDPOINTS } from '@/constants';
+import { USERNAME_REGEX, BIO_MAX_LENGTH, API_ENDPOINTS } from '@/constants';
 
 type AvatarType = 'upload' | 'url';
 
@@ -37,7 +37,7 @@ const ProfileForm = () => {
         setBio(user.profile.bio || '');
         setCountry(user.profile.country || '');
         setCity(user.profile.city || '');
-        setAvatarUrl(user.profile.avatarUrl || `${DICEBEAR_AVATAR_API}?seed=${user.username}`);
+        setAvatarUrl(user.profile.avatarUrl || store.getAvatarUrl());
       }
     }
   }, [user]);
@@ -216,11 +216,11 @@ const ProfileForm = () => {
               <div className="flex items-start gap-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-container shadow-ambient shrink-0">
                   <img
-                    src={currentAvatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'}
+                    src={currentAvatar || store.getAvatarUrl()}
                     alt="Profile"
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=default';
+                      e.currentTarget.src = store.getAvatarUrl();
                     }}
                   />
                 </div>
@@ -423,7 +423,7 @@ const ProfileForm = () => {
                     setBio(user.profile.bio || '');
                     setCountry(user.profile.country || '');
                     setCity(user.profile.city || '');
-                    setAvatarUrl(user.profile.avatarUrl || `${DICEBEAR_AVATAR_API}?seed=${user.username}`);
+                    setAvatarUrl(user.profile.avatarUrl || store.getAvatarUrl());
                   } else {
                     setFirstName('');
                     setLastName('');

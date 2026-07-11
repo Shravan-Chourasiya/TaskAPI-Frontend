@@ -1,13 +1,20 @@
 import { persist } from "zustand/middleware";
 import { create } from "zustand";
 import { apiInstance } from "./axiosInstance";
-import { API_ENDPOINTS } from "@/constants";
+import { API_ENDPOINTS, DICEBEAR_AVATAR_API } from "@/constants";
 import type { AuthStore, PlanStore, User } from "./zustandStore.type";
 
-export const authStore = create<AuthStore>((set) => ({
+export const authStore = create<AuthStore>((set, get) => ({
 	isAuthenticated: false,
 	user: null,
 	isLoading: true,
+	getAvatarUrl: () => {
+		const user = get().user;
+		return (
+			user?.profile?.avatarUrl ||
+			`${DICEBEAR_AVATAR_API}?seed=${user?.email || user?.username || "default"}`
+		);
+	},
 
 	login: async (email: string, password: string) => {
 		set({ isLoading: true });
@@ -101,8 +108,6 @@ export const authStore = create<AuthStore>((set) => ({
 		set({ isAuthenticated: authenticated }),
 	setUser: (user: User | null) => set({ user }),
 }));
-
-
 
 export const usePlanStore = create<PlanStore>()(
 	persist(
