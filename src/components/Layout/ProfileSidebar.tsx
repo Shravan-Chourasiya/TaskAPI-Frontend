@@ -1,7 +1,7 @@
 // Frontend/src/components/Layout/ProfileSidebar.tsx
 import { Key, LogOut, X, Edit, Plus, Eye, EyeOff, Copy, Check, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import authStore from '@/lib/zustandStore';
+import { authStore } from '@/lib/zustandStore';
 import { Button } from '../ui/button';
 import { DICEBEAR_AVATAR_API } from '@/constants';
 import { useState } from 'react';
@@ -49,7 +49,7 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
         setCreating(true);
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
+
         // Generate mock API key
         const mockKey = `tk_live_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
         setGeneratedKey(mockKey);
@@ -73,7 +73,7 @@ const ProfileSidebar = ({ isOpen, onClose }: ProfileSidebarProps) => {
             permissions: Object.keys(permissions).filter(p => permissions[p as keyof typeof permissions] && p !== 'all'),
             createdAt: new Date().toISOString()
         };
-        
+
         const blob = new Blob([JSON.stringify(keyData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

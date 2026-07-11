@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Edit, Mail, MapPin, FileText, User as UserIcon, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import authStore from '@/lib/zustandStore';
+import { authStore } from '@/lib/zustandStore';
 import { DICEBEAR_AVATAR_API } from '@/constants';
 
 const Profile = () => {

@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { APP_NAME, DICEBEAR_AVATAR_API } from '@/constants';
-import authStore from '@/lib/zustandStore';
+import { authStore } from '@/lib/zustandStore';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -16,17 +16,17 @@ const Navbar = () => {
                         {APP_NAME}
                     </NavLink>
                     <div className="hidden md:flex gap-6 items-center">
-                        <NavLink 
-                            to='/pricing' 
-                            className={({ isActive }) => 
+                        <NavLink
+                            to='/pricing'
+                            className={({ isActive }) =>
                                 `text-sm font-semibold transition-all duration-200 ${isActive ? 'text-[#004e47]' : 'text-gray-600 hover:text-[#004e47]'}`
                             }
                         >
                             Pricing
                         </NavLink>
-                        <NavLink 
-                            to='/docs' 
-                            className={({ isActive }) => 
+                        <NavLink
+                            to='/docs'
+                            className={({ isActive }) =>
                                 `text-sm font-semibold transition-all duration-200 ${isActive ? 'text-[#004e47]' : 'text-gray-600 hover:text-[#004e47]'}`
                             }
                         >

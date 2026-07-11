@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authStore from '@/lib/zustandStore';
+import { authStore } from '@/lib/zustandStore';
 import { apiInstance } from '@/lib/axiosInstance';
 import { Menu, PanelLeftClose, LayoutDashboard, Key, CreditCard, HelpCircle, LogOut, Zap, User, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,11 +35,11 @@ interface RollupBucket {
 type RangePreset = '1h' | '6h' | '24h' | '2d' | '7d' | '30d';
 
 const RANGE_PRESETS: { label: string; value: RangePreset; ms: number }[] = [
-  { label: '1H',  value: '1h',  ms: 60 * 60 * 1000 },
-  { label: '6H',  value: '6h',  ms: 6 * 60 * 60 * 1000 },
+  { label: '1H', value: '1h', ms: 60 * 60 * 1000 },
+  { label: '6H', value: '6h', ms: 6 * 60 * 60 * 1000 },
   { label: '24H', value: '24h', ms: 24 * 60 * 60 * 1000 },
-  { label: '2D',  value: '2d',  ms: 2 * 24 * 60 * 60 * 1000 },
-  { label: '7D',  value: '7d',  ms: 7 * 24 * 60 * 60 * 1000 },
+  { label: '2D', value: '2d', ms: 2 * 24 * 60 * 60 * 1000 },
+  { label: '7D', value: '7d', ms: 7 * 24 * 60 * 60 * 1000 },
   { label: '30D', value: '30d', ms: 30 * 24 * 60 * 60 * 1000 },
 ];
 
@@ -65,12 +65,12 @@ const Dashboard = () => {
 
   const stats = {
     successCount: buckets.reduce((s, b) => s + b.successCount, 0),
-    failedCount:  buckets.reduce((s, b) => s + b.errorCount, 0),
+    failedCount: buckets.reduce((s, b) => s + b.errorCount, 0),
     avgLatency: buckets.length
       ? Math.round(
-          buckets.reduce((s, b) => s + b.successDurationSum + b.errorDurationSum, 0) /
-          buckets.reduce((s, b) => s + b.successCount + b.errorCount, 0) || 0
-        )
+        buckets.reduce((s, b) => s + b.successDurationSum + b.errorDurationSum, 0) /
+        buckets.reduce((s, b) => s + b.successCount + b.errorCount, 0) || 0
+      )
       : 0,
   };
 
@@ -80,7 +80,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchMetrics();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rangePreset, selectedApiKeyId]);
 
   const fetchApiKeys = async () => {
@@ -210,8 +210,8 @@ const Dashboard = () => {
       <header className={`fixed top-0 right-0 h-16 z-40 bg-white/80 backdrop-blur-md flex items-center px-6 border-b border-gray-200 transition-all duration-300 ${sidebarOpen ? 'left-72' : 'left-0'}`}>
         <div className="flex items-center gap-4 justify-between w-full">
           <div className="flex items-center gap-4">
-            <Button 
-              onClick={() => setSidebarOpen(true)} 
+            <Button
+              onClick={() => setSidebarOpen(true)}
               variant="ghost"
               size="icon"
               className={`transition-all ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
@@ -318,8 +318,8 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-green-500 rounded-full" 
+                    <div
+                      className="h-full bg-green-500 rounded-full"
                       style={{ width: `${(stats.successCount / (stats.successCount + stats.failedCount)) * 100}%` }}
                     ></div>
                   </div>
@@ -359,19 +359,19 @@ const Dashboard = () => {
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={responseTimeData.length > 0 ? (responseFilter === 'success' ? responseTimeData.map(d => ({ time: d.time, success: d.success })) : responseFilter === 'error' ? responseTimeData.map(d => ({ time: d.time, error: d.error })) : responseTimeData) : [{ time: '00:00', success: 0, error: 0 }]}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis 
+                    <XAxis
                       type="category"
-                      dataKey="time" 
-                      tick={{ fontSize: 12 }} 
-                      axisLine={{ stroke: '#9ca3af' }} 
+                      dataKey="time"
+                      tick={{ fontSize: 12 }}
+                      axisLine={{ stroke: '#9ca3af' }}
                       tickLine={{ stroke: '#9ca3af' }}
                     />
-                    <YAxis 
+                    <YAxis
                       type="number"
                       domain={[0, 150]}
-                      tick={{ fontSize: 12 }} 
-                      label={{ value: 'ms', angle: -90, position: 'insideLeft', fontSize: 12 }} 
-                      axisLine={{ stroke: '#9ca3af' }} 
+                      tick={{ fontSize: 12 }}
+                      label={{ value: 'ms', angle: -90, position: 'insideLeft', fontSize: 12 }}
+                      axisLine={{ stroke: '#9ca3af' }}
                       tickLine={{ stroke: '#9ca3af' }}
                     />
                     <Tooltip
@@ -397,18 +397,18 @@ const Dashboard = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={usageData.length > 0 ? usageData : [{ day: 'Mon', requests: 0 }]}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis 
+                  <XAxis
                     type="category"
-                    dataKey="day" 
-                    tick={{ fontSize: 12 }} 
-                    axisLine={{ stroke: '#9ca3af' }} 
-                    tickLine={{ stroke: '#9ca3af' }} 
+                    dataKey="day"
+                    tick={{ fontSize: 12 }}
+                    axisLine={{ stroke: '#9ca3af' }}
+                    tickLine={{ stroke: '#9ca3af' }}
                   />
-                  <YAxis 
+                  <YAxis
                     type="number"
                     domain={[0, 'auto']}
-                    tick={{ fontSize: 12 }} 
-                    axisLine={{ stroke: '#9ca3af' }} 
+                    tick={{ fontSize: 12 }}
+                    axisLine={{ stroke: '#9ca3af' }}
                     tickLine={{ stroke: '#9ca3af' }}
                     label={{ value: 'Requests', angle: -90, position: 'insideLeft', fontSize: 12 }}
                   />
@@ -417,13 +417,13 @@ const Dashboard = () => {
                     labelStyle={{ color: '#374151', fontWeight: 'bold' }}
                   />
                   <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="requests" 
-                    stroke="#004e47" 
-                    strokeWidth={3} 
-                    dot={{ fill: '#004e47', r: 5 }} 
-                    name="API Requests" 
+                  <Line
+                    type="monotone"
+                    dataKey="requests"
+                    stroke="#004e47"
+                    strokeWidth={3}
+                    dot={{ fill: '#004e47', r: 5 }}
+                    name="API Requests"
                   />
                 </LineChart>
               </ResponsiveContainer>

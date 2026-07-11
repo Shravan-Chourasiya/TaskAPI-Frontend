@@ -4,7 +4,7 @@ import { CreditCard, Shield, Lock, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { apiInstance } from '@/lib/axiosInstance';
-import { usePlanStore } from '@/lib/planStore';
+import { usePlanStore } from '@/lib/zustandStore';
 import { toast } from 'sonner';
 import { config } from '@/utils/config';
 import { RAZORPAY_SCRIPT_URL, APP_NAME, PRIMARY_COLOR, DEFAULT_PLAN, API_ENDPOINTS, SUBSCRIPTION_PLANS, type PlanName } from '@/constants';

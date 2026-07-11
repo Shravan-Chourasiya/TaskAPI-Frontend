@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Check, Key, RefreshCw, Zap } from 'lucide-react';
 import React from 'react';
-import { usePlanStore } from '@/lib/planStore';
-import { PRICING_PLANS, SUBSCRIPTION_PLANS, type PlanName } from '@/constants';
-
+import { usePlanStore } from '@/lib/zustandStore';
+import { PRICING_PLANS, type PlanName } from '@/constants';
 
 
 type PricingCardType = {

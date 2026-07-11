@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import authStore from '@/lib/zustandStore';
+import { authStore } from '@/lib/zustandStore';
 import { apiInstance } from '@/lib/axiosInstance';
 import { Menu, PanelLeftClose, LayoutDashboard, Key, CreditCard, HelpCircle, LogOut, Zap, User, Pencil, Trash2, Shield, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -95,7 +95,7 @@ const ApiCredentials = () => {
     if (!confirm('Are you sure you want to delete this API key?')) return;
 
     try {
-      const response = await apiInstance.post(API_ENDPOINTS.APIKEY.REVOKE.replace(':id', keyId));
+      const response = await apiInstance.delete(API_ENDPOINTS.APIKEY.DELETE.replace(':id', keyId));
 
       if (response.data?.success) {
         toast.success('API key deleted successfully');

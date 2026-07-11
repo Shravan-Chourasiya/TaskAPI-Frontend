@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode, useRef } from 'react';
 import { AuthContext } from '@/utils/authContext';
-import authStore from '@/lib/zustandStore';
+import { authStore } from '@/lib/zustandStore';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const store = authStore();

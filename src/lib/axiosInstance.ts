@@ -1,6 +1,6 @@
 import { REFRESH_TIMEOUT_MS, TOKEN_ERROR_STATUSES, API_ENDPOINTS } from "@/constants";
 import { config } from "@/utils/config";
-import authStore from "@/lib/zustandStore";
+import {authStore} from "@/lib/zustandStore";
 import axios from "axios";
 
 declare module 'axios' {

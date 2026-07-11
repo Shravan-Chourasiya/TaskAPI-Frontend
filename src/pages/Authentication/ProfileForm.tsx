@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { User, MapPin, FileText, Upload, Link as LinkIcon, Save, X, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiInstance } from '@/lib/axiosInstance';
-import authStore from '@/lib/zustandStore';
+import { authStore } from '@/lib/zustandStore';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { USERNAME_REGEX, BIO_MAX_LENGTH, DICEBEAR_AVATAR_API, API_ENDPOINTS } from '@/constants';
@@ -75,7 +75,7 @@ const ProfileForm = () => {
       toast.error('Username must start with a letter and contain only letters, numbers, hyphens, and underscores (5-30 characters)');
       return;
     }
-    
+
     setUsernameLoading(true);
     try {
       const response = await apiInstance.patch(API_ENDPOINTS.AUTH.ACCOUNT_UPDATE, {
@@ -212,12 +212,12 @@ const ProfileForm = () => {
               <label className="block text-sm font-bold text-on-surface">
                 Profile Picture
               </label>
-              
+
               <div className="flex items-start gap-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-container shadow-ambient shrink-0">
-                  <img 
-                    src={currentAvatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'} 
-                    alt="Profile" 
+                  <img
+                    src={currentAvatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'}
+                    alt="Profile"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=default';
