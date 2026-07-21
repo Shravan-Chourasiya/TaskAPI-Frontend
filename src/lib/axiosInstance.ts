@@ -20,6 +20,17 @@ let failedQueue: Array<{
 	reject: (err: unknown) => void;
 }> = [];
 
+// CSRF token management
+let csrfToken: string | null = null;
+
+export function setCsrfToken(token: string | null): void {
+	csrfToken = token;
+}
+
+export function getCsrfToken(): string | null {
+	return csrfToken;
+}
+
 const processQueue = (error: unknown = null): void => {
 	failedQueue.forEach((entry) =>
 		error ? entry.reject(error) : entry.resolve(),
@@ -52,8 +63,24 @@ const refreshToken = (): Promise<void> => {
 	return Promise.race([refresh, timeout]);
 };
 
+const MUTATING_METHODS = new Set(["post", "put", "patch", "delete"]);
+
+apiInstance.interceptors.request.use((config) => {
+	if (csrfToken && config.method && MUTATING_METHODS.has(config.method)) {
+		config.headers["x-csrf-token"] = csrfToken;
+	}
+	return config;
+});
+
 apiInstance.interceptors.response.use(
-	(response) => response,
+	(response) => {
+		// Capture CSRF token from login / token-refresh responses
+		const incomingToken = response.headers["x-csrf-token"];
+		if (incomingToken) {
+			csrfToken = incomingToken;
+		}
+		return response;
+	},
 	async (error) => {
 		const originalRequest = error.config;
 		
