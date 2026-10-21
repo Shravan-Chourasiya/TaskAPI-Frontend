@@ -1,30 +1,10 @@
-import { useEffect, type ReactNode, useRef } from 'react';
-import { AuthContext } from '@/utils/authContext';
-import { authStore } from '@/lib/zustandStore';
+import { createContext, useContext } from "react";
+import type { AuthStore } from "@/lib/zustandStore.type";
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const store = authStore();
-  const hasCheckedAuth = useRef(false);
+export const AuthContext = createContext<AuthStore | undefined>(undefined);
 
-  useEffect(() => {
-    if (!hasCheckedAuth.current) {
-      hasCheckedAuth.current = true;
-      authStore.getState().checkAuth();
-    }
-  }, [])
-
-
-
-  return (
-    <AuthContext.Provider value={{
-      isAuthenticated: store.isAuthenticated,
-      isLoading: store.isLoading,
-      user: store.user,
-      login: store.login,
-      logout: store.logout,
-      refreshUser: store.refreshUser
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
+export const useAuth = () => {
+	const context = useContext(AuthContext);
+	if (!context) throw new Error("useAuth must be used within an AuthProvider");
+	return context;
 };

@@ -1,114 +1,98 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, Terminal } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/Input"
 
-const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
-  const auth = useAuth();
+const Login = () => {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [requires2FA, setRequires2FA] = useState(false)
+  const { isLoading, login } = useAuth()
+  const navigate = useNavigate()
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    auth.login(email, password).then(() => {
-      toast.success('Login successful!');
-      navigate('/dashboard');
-    }).catch((error: Error) => {
-      toast.error(error.message || 'Login failed. Please try again.');
-    });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    try {
+      await login(email, password)
+      toast.success("Signed in")
+      if (requires2FA) {
+        navigate("/2fa")
+      } else {
+        navigate("/dashboard")
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign in failed")
+    }
   }
+
   return (
-    <div className="flex items-center justify-center px-6 py-8">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-primary text-[11.5px] font-bold tracking-widest uppercase mb-4">
-            <Terminal className="w-3 h-3" />
-            Secure Access
-          </div>
-          <h1 className="text-[46px] md:text-[57.5px] font-extrabold text-on-surface mb-3 -tracking-[0.02em]">
-            Welcome Back
-          </h1>
-          <p className="text-secondary text-[20.7px]">
-            Sign in to access your dashboard
-          </p>
+    <div className="min-h-screen flex items-center justify-center px-6 py-8">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <h1 className="text-h2 font-semibold text-primary">Welcome back</h1>
+          <p className="mt-2 text-secondary">Sign in to access your dashboard</p>
         </div>
 
-        <div className="bg-surface-container-low p-8 rounded-3xl shadow-ambient border-2 border-outline-variant">
-          <form onSubmit={handleLogin} className="space-y-6">
+        <div className="rounded-3xl bg-surface-container-low p-8 shadow-sm">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <Input
+              type="email"
+              label="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your.email@example.com"
+              required
+            />
 
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-[16.1px] font-bold text-on-surface">
-                Your Registered Email
+            <Input
+              type="password"
+              label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={requires2FA}
+                  onChange={(e) => setRequires2FA(e.target.checked)}
+                  className="rounded border-outline"
+                />
+                <span className="text-sm text-on-surface">Require 2FA (mock)</span>
               </label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors text-[16.1px]"
-                  placeholder="your.email@example.com"
-                  required
-                />
-              </div>
+              <a href="/forgot-password" className="text-sm text-primary hover:underline">
+                Forgot password?
+              </a>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-[16.1px] font-bold text-on-surface">
-                  Your Password
-                </label>
-                <Link to="/forgot-password" className="text-[13.8px] text-primary font-bold hover:underline">
-                  Forgot Password?
-                </Link>
+            {error && (
+              <div className="p-2 bg-destructive-container text-sm text-destructive rounded">
+                {error}
               </div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-2 border-transparent focus:border-primary outline-none text-on-surface transition-colors text-[16.1px]"
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-            </div>
+            )}
 
-            <Button
-              type="submit"
-              disabled={auth.isLoading}
-              size="lg"
-              className="w-full text-[16.1px]"
-            >
-              {auth.isLoading ? 'Signing in...' : 'Sign In'}
-              {!auth.isLoading && <ArrowRight className="w-4 h-4" />}
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-secondary text-[16.1px]">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-primary font-bold hover:underline">
-                Create one
-              </Link>
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4 text-center">
-          <Link to="/" className="text-secondary text-[16.1px] hover:text-on-surface transition-colors">
-            ← <span className="underline">Back to Home</span>
-          </Link>
+          <p className="mt-6 text-sm text-center text-secondary">
+            Don't have an account?{" "}
+            <a href="/signup" className="font-medium text-primary hover:underline">
+              Create one
+            </a>
+          </p>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

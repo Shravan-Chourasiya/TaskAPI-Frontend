@@ -1,162 +1,63 @@
-import { Link } from 'react-router-dom';
-import { ArrowRight, Terminal, Shield, Zap, Code2, Globe } from 'lucide-react';
+import { Link } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { Reveal } from "@/components/ui/Reveal"
+import { KeyRound, Shield, Zap, Code2 } from "lucide-react"
 
-const Home: React.FC = () => {
+const Home = () => {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section - The Precision Luminary Layout */}
-      <section className="pb-16 px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row items-center gap-16">
-          <div className="flex-1 space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-primary text-xs font-bold tracking-widest uppercase">
-              <Zap className="w-3 h-3" />
-              API-First Infrastructure
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-extrabold text-on-surface leading-[1.1] -tracking-[0.03em]">
-              Authentication Built for the <span className="text-primary">API-First Era</span>
+    <div className="min-h-screen bg-surface">
+      {/* Hero */}
+      <header className="border-b border-outline-variant">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <span className="text-h4 font-bold text-primary">Authrix</span>
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-sm text-on-surface hover:text-primary">Sign in</Link>
+            <Link to="/signup"><Button>Create account</Button></Link>
+          </div>
+        </nav>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-6">
+        <section className="py-20 text-center">
+          <Reveal>
+            <span className="inline-block rounded-full bg-surface-container px-3 py-1 text-xs font-medium text-primary">
+              The API layer for modern authentication
+            </span>
+            <h1 className="mt-6 text-h1 font-bold text-on-surface">
+              Authentication that developers actually want
             </h1>
-            
-            <p className="text-xl text-secondary max-w-xl leading-relaxed">
-              Secure, scalable auth that developers actually want to use. Zero friction, maximum control. Built as a headless utility for your entire ecosystem.
+            <p className="mx-auto mt-4 max-w-2xl text-body-lg text-secondary">
+              Issue API keys, verify identities, and enforce access — all from a clean API built for speed and reliability.
             </p>
-            
-            <div className="flex flex-wrap gap-4 pt-4">
-              <Link to="/pricing" className="bg-primary text-on-primary px-8 py-4 rounded-md font-bold hover:bg-primary-container transition-[background-color,box-shadow,transform] hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center gap-2 shadow-ambient hover:shadow-ambient-hover">
-                Get Started
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link to="/docs" className="px-8 py-4 rounded-md font-bold text-on-surface hover:bg-surface-container transition-colors duration-200 flex items-center gap-2 ghost-border">
-                Read API Docs
-              </Link>
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <Link to="/signup"><Button size="lg">Start building</Button></Link>
+              <Link to="/login"><Button size="lg" variant="outline">View dashboard</Button></Link>
             </div>
-          </div>
+          </Reveal>
+        </section>
 
-          <div className="flex-1 w-full">
-            {/* Code Block Component */}
-            <div className="bg-[#293040] rounded-xl overflow-hidden shadow-2xl scale-105 lg:scale-110">
-              <div className="bg-[#3d4947]/30 px-6 py-3 flex items-center justify-between border-b border-white/5">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-                  <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+        <section className="grid gap-6 pb-20 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: KeyRound, title: "API keys", desc: "Issue and rotate keys in seconds." },
+            { icon: Shield, title: "Secure by default", desc: "Scoped access and revocation built in." },
+            { icon: Zap, title: "Fast", desc: "Edge-verified tokens with low latency." },
+            { icon: Code2, title: "Developer-first", desc: "Clean SDKs and predictable responses." },
+          ].map((f) => {
+            const Icon = f.icon
+            return (
+              <Reveal key={f.title} className="delay-100">
+                <div className="rounded-lg border border-outline-variant bg-surface-container-lowest p-6">
+                  <Icon className="h-6 w-6 text-primary" />
+                  <h3 className="mt-3 text-h5 font-semibold text-on-surface">{f.title}</h3>
+                  <p className="mt-1 text-sm text-secondary">{f.desc}</p>
                 </div>
-                <div className="flex items-center gap-2 text-[10px] font-mono text-outline uppercase tracking-widest font-bold">
-                  <Terminal className="w-3 h-3" />
-                  registration.js
-                </div>
-              </div>
-              <div className="p-8 pb-10 overflow-x-auto">
-                <pre className="font-mono text-sm leading-relaxed">
-                  <code className="text-[#89f5e7]">{"// Initialize secure user registration"}</code>{"\n"}
-                  <code className="text-white">fetch</code>
-                  <code className="text-outline-variant">(</code>
-                  <code className="text-[#ffdbce]">'https://api.taskapi.com/v1/auth'</code>
-                  <code className="text-outline-variant">, {"{"}</code>{"\n"}
-                  {"  "}
-                  <code className="text-white">method</code>
-                  <code className="text-outline-variant">: </code>
-                  <code className="text-[#ffdbce]">'POST'</code>
-                  <code className="text-outline-variant">,</code>{"\n"}
-                  {"  "}
-                  <code className="text-white">headers</code>
-                  <code className="text-outline-variant">: {"{"}</code>{"\n"}
-                  {"    "}
-                  <code className="text-[#ffdbce]">'X-API-Key'</code>
-                  <code className="text-outline-variant">: </code>
-                  <code className="text-[#ffdbce]">'tk_live_492...x82'</code>
-                  <code className="text-outline-variant">,</code>{"\n"}
-                  {"    "}
-                  <code className="text-[#ffdbce]">'Content-Type'</code>
-                  <code className="text-outline-variant">: </code>
-                  <code className="text-[#ffdbce]">'application/json'</code>{"\n"}
-                  {"  "}
-                  <code className="text-outline-variant">{"}"},</code>{"\n"}
-                  {"  "}
-                  <code className="text-white">body</code>
-                  <code className="text-outline-variant">: </code>
-                  <code className="text-white">JSON</code>
-                  <code className="text-outline-variant">.</code>
-                  <code className="text-white">stringify</code>
-                  <code className="text-outline-variant">(</code>
-                  <code className="text-outline-variant">{"{"}</code>{"\n"}
-                  {"    "}
-                  <code className="text-white">email</code>
-                  <code className="text-outline-variant">: </code>
-                  <code className="text-[#ffdbce]">"dev@example.com"</code>
-                  <code className="text-outline-variant">,</code>{"\n"}
-                  {"    "}
-                  <code className="text-white">strategy</code>
-                  <code className="text-outline-variant">: </code>
-                  <code className="text-[#ffdbce]">"passkey"</code>
-                  <code className="text-outline-variant">,</code>{"\n"}
-                  {"    "}
-                  <code className="text-white">tenant_id</code>
-                  <code className="text-outline-variant">: </code>
-                  <code className="text-[#ffdbce]">"org_992"</code>{"\n"}
-                  {"  "}
-                  <code className="text-outline-variant">{"}"}</code>
-                  <code className="text-outline-variant">)</code>{"\n"}
-                  <code className="text-outline-variant">{"}"})</code>
-                </pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Tonal Shift Separator (No-Line Rule) */}
-      <section className="bg-surface-container-low py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-white shadow-ambient flex items-center justify-center text-primary">
-                <Code2 className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-on-surface">API-First Architecture</h3>
-              <p className="text-secondary leading-relaxed">Headless auth for custom flows. No redirected pages or proprietary widgets—just clean REST endpoints for your ecosystem.</p>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-white shadow-ambient flex items-center justify-center text-primary">
-                <Shield className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-on-surface">Security-First Design</h3>
-              <p className="text-secondary leading-relaxed">Zero-trust principles with automated credential rotation and SOC2-ready infrastructure protecting every request.</p>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-white shadow-ambient flex items-center justify-center text-primary">
-                <Globe className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-on-surface">Developer Experience</h3>
-              <p className="text-secondary leading-relaxed">Production-ready SDKs for major languages and a CLI designed to minimize friction from setup to deployment.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="bg-linear-to-br from-primary/10 via-surface-container-low to-primary/5 p-12 md:p-16 rounded-3xl shadow-ambient text-center space-y-6">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-on-surface -tracking-[0.02em]">
-            Ready to build the future?
-          </h2>
-          <p className="text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
-            Join thousands of developers who trust TaskAPI for their authentication infrastructure. Start building in minutes.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center pt-4">
-            <Link to="/register" className="bg-primary text-on-primary px-8 py-4 rounded-md font-bold hover:opacity-90 active:scale-95 transition-all shadow-lg">
-              Get Started Free
-            </Link>
-            <Link to="/pricing" className="bg-surface text-on-surface px-8 py-4 rounded-md font-bold hover:bg-surface-container transition-colors">
-              View Pricing
-            </Link>
-          </div>
-        </div>
-      </section>
+              </Reveal>
+            )
+          })}
+        </section>
+      </main>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

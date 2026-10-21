@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import { authStore } from '@/lib/zustandStore';
 import { apiInstance } from '@/lib/axiosInstance';
 import { Menu, PanelLeftClose, LayoutDashboard, Key, CreditCard, HelpCircle, LogOut, Zap, User, CheckCircle, XCircle } from 'lucide-react';
@@ -186,7 +186,9 @@ const Dashboard = () => {
 
           <div className="mt-auto pt-4 space-y-2 border-t border-gray-200">
             {(!user?.role?.includes('pro') && !user?.role?.includes('premium')) && (
-              <Button className="w-full bg-[#004e47] text-white py-3 px-4 rounded-xl font-semibold hover:bg-[#004e47]/90 flex items-center justify-center gap-2 text-sm">
+              <Button onClick={() => {
+                navigate('/pricing');
+              }} className="w-full bg-[#004e47] text-white py-3 px-4 rounded-xl font-semibold hover:bg-[#004e47]/90 flex items-center justify-center gap-2 text-sm">
                 <Zap className="w-4 h-4" />
                 Upgrade to Pro
               </Button>

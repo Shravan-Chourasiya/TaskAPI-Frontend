@@ -1,31 +1,192 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Precision Luminary Palette */
+  /* ============================================================
+     COLOR — Precision Luminary Palette (unchanged)
+     ============================================================ */
   --color-primary: #00685f;
   --color-primary-container: #008378;
   --color-on-primary: #ffffff;
-  
+
   --color-surface: #f9f9ff;
   --color-surface-container: #e9edff;
   --color-surface-container-low: #f1f3ff;
   --color-surface-container-high: #e1e8fd;
   --color-surface-container-lowest: #ffffff;
-  
+
   --color-on-surface: #141b2b;
   --color-secondary: #555f70;
   --color-outline: #6d7a77;
   --color-outline-variant: #bcc9c6;
-  
-  /* Typography */
+
+  /* ── Semantic status colors (new) ──────────────────────────
+     Chosen to sit next to the teal primary + indigo-tinted
+     surfaces without competing with either. */
+  --color-success: #1a8f5c;
+  --color-success-container: #d5f2e3;
+  --color-on-success: #ffffff;
+
+  --color-warning: #b56a1c;
+  --color-warning-container: #fbe8cf;
+  --color-on-warning: #ffffff;
+
+  --color-info: #3b5bdb;
+  --color-info-container: #dfe4fb;
+  --color-on-info: #ffffff;
+
+  --color-destructive: #ef4444;
+  --color-destructive-container: #fde2e2;
+  --color-on-destructive: #ffffff;
+
+  /* Used for the "key copied" flash state and other momentary
+     confirmations — deliberately distinct from --color-success
+     so a copy-flash never gets confused with a saved/created state. */
+  --color-flash: #00685f;
+
+  /* ============================================================
+     TYPOGRAPHY
+     ============================================================ */
   --font-headline: "Manrope", sans-serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  /* Shadows */
+  /* Weights — only what's actually loaded above. Do not use a
+     weight not listed here; the browser will synthesize (fake)
+     bold/italic on font-mono and it looks wrong on API keys. */
+  --font-weight-headline-regular: 400;
+  --font-weight-headline-semibold: 600;
+  --font-weight-headline-bold: 700;
+  --font-weight-headline-extrabold: 800;
+
+  --font-weight-body-regular: 400;
+  --font-weight-body-medium: 500;
+  --font-weight-body-semibold: 600;
+
+  --font-weight-mono-regular: 400;
+  --font-weight-mono-bold: 700;
+
+  /* Type scale — size + line-height pairs (Tailwind v4 syntax:
+     --text-{name} and --text-{name}--line-height). Tracking is
+     set per-size below via --tracking-*. Built for a technical
+     dashboard: tight, controlled headlines; a neutral, highly
+     readable body size; a dedicated code/key size distinct from
+     body text so keys never get mistaken for prose. */
+  --text-display: 3.5rem;
+  --text-display--line-height: 1.05;
+
+  --text-h1: 2.5rem;
+  --text-h1--line-height: 1.15;
+
+  --text-h2: 2rem;
+  --text-h2--line-height: 1.2;
+
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 1.25;
+
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.3;
+
+  --text-h5: 1.0625rem;
+  --text-h5--line-height: 1.35;
+
+  --text-body-lg: 1.0625rem;
+  --text-body-lg--line-height: 1.6;
+
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.55;
+
+  --text-body-sm: 0.8125rem;
+  --text-body-sm--line-height: 1.5;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+
+  /* Code / API key display. Sized slightly larger than body-sm
+     so a masked key (tk_live_••••••••1a2b) stays legible at a
+     glance in a table row. */
+  --text-code: 0.875rem;
+  --text-code--line-height: 1.6;
+
+  --text-code-sm: 0.75rem;
+  --text-code-sm--line-height: 1.5;
+
+  /* Tracking — headlines pull tight per Manrope's wide default
+     metrics; body stays near-neutral for readability. */
+  --tracking-display: -0.02em;
+  --tracking-headline: -0.015em;
+  --tracking-body: -0.005em;
+  --tracking-caption: 0em;
+  --tracking-code: 0em;
+
+  /* ============================================================
+     RADIUS
+     ============================================================ */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  /* matches legacy --radius below */
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ============================================================
+     SHADOWS / ELEVATION
+     ============================================================ */
+  --shadow-xs: 0px 1px 2px rgba(20, 27, 43, 0.04);
+  --shadow-sm: 0px 4px 8px rgba(20, 27, 43, 0.05);
   --shadow-ambient: 0px 16px 32px rgba(20, 27, 43, 0.06);
   --shadow-ambient-hover: 0px 24px 48px rgba(20, 27, 43, 0.1);
+  --shadow-lg: 0px 32px 64px rgba(20, 27, 43, 0.12);
+
+  /* For primary CTAs / focused interactive surfaces — a soft
+     tinted glow rather than a generic dark drop shadow. */
+  --shadow-glow-primary: 0px 8px 24px rgba(0, 104, 95, 0.25);
+
+  /* Inset shadow for pressed/active button states. */
+  --shadow-inset: inset 0px 1px 2px rgba(20, 27, 43, 0.08);
+
+  /* ============================================================
+     MOTION
+     ============================================================ */
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 450ms;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ============================================================
+     Z-INDEX — semantic stacking for a dashboard's overlay layers
+     ============================================================ */
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-toast: 70;
+  --z-tooltip: 80;
+
+  /* ============================================================
+     CONTROL SIZING — consistent heights across buttons/inputs/
+     selects so mixed rows (e.g. a search bar next to a filter
+     dropdown) always align.
+     ============================================================ */
+  --size-control-sm: 2rem;
+  --size-control-md: 2.5rem;
+  --size-control-lg: 3rem;
+
+  /* ============================================================
+     FOCUS RING — explicit token, not just relying on browser
+     default outline. Pairs with the .focus-ring utility below.
+     ============================================================ */
+  --color-focus-ring: #00685f;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
 }
 
 @layer base {
@@ -44,6 +205,16 @@
     --muted-foreground: 109 122 119;
     --accent: 225 232 253;
     --accent-foreground: 20 27 43;
+
+    /* New semantic status vars, RGB triplets to match the
+       shadcn-style pattern already used for the rest of this block. */
+    --success: 26 143 92;
+    --success-foreground: 255 255 255;
+    --warning: 181 106 28;
+    --warning-foreground: 255 255 255;
+    --info: 59 91 219;
+    --info-foreground: 255 255 255;
+
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
     --border: 188 201 198;
@@ -53,39 +224,90 @@
   }
 }
 
-  body {
-    @apply bg-surface text-on-surface font-body;
-    -webkit-user-select: auto;
-    -moz-user-select: auto;
-    -ms-user-select: auto;
-    user-select: auto;
-    /* webhint-disable compat-api/css */
-    -webkit-user-drag: none;
-    /* webhint-enable compat-api/css */
-  }
-  
-  img {
-    /* webhint-disable compat-api/css */
-    -webkit-user-drag: none;
-    /* webhint-enable compat-api/css */
-    pointer-events: auto;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-headline tracking-tight;
-  }
+body {
+  @apply bg-surface text-on-surface font-body;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+  /* webhint-disable compat-api/css */
+  -webkit-user-drag: none;
+  /* webhint-enable compat-api/css */
+}
 
-  ::selection {
-    background-color: Highlight;
-    color: HighlightText;
-  }
+img {
+  /* webhint-disable compat-api/css */
+  -webkit-user-drag: none;
+  /* webhint-enable compat-api/css */
+  pointer-events: auto;
+}
 
-/* Glassmorphism Utility */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-headline tracking-tight;
+}
+
+::selection {
+  background-color: Highlight;
+  color: HighlightText;
+}
+
+/* ============================================================
+   ACCESSIBILITY — visible keyboard focus, respected motion pref
+   ============================================================ */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Glassmorphism Utility (unchanged)
+   ============================================================ */
 .glass {
   @apply bg-surface-container-lowest/80 backdrop-blur-md;
 }
 
-/* Ghost Border Rule: Never 100% opaque */
+/* Ghost Border Rule: Never 100% opaque (unchanged) */
 .ghost-border {
   border: 1px solid rgba(188, 201, 198, 0.15);
+}
+
+/* ============================================================
+   Code / API key display treatment (new)
+   Used for masked keys in tables and the one-time "raw key"
+   reveal on creation.
+   ============================================================ */
+.key-display {
+  @apply font-mono text-code bg-surface-container-high text-on-surface;
+  letter-spacing: var(--tracking-code);
+  border-radius: var(--radius-sm);
+  padding: 0.375rem 0.625rem;
+}
+
+/* Momentary confirmation state, e.g. after "Copy" is clicked.
+   Intentionally brief — pair with a ~600ms timeout in JS, not
+   a lingering state. */
+.key-display--flash {
+  outline: var(--focus-ring-width) solid var(--color-flash);
+  outline-offset: 1px;
 }

@@ -1,7 +1,8 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
+import { m } from "motion/react"
+import { BUTTON_HOVER } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
@@ -10,7 +11,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-on-primary shadow-lg shadow-primary/20 hover:bg-primary-container hover:scale-[1.02] active:scale-[0.98]",
-        destructive: "bg-error text-on-error shadow-lg shadow-error/20 hover:bg-error/90",
+        destructive: "bg-destructive text-on-destructive shadow-lg shadow-destructive/20 hover:bg-destructive/90",
         outline: "border-2 border-primary bg-transparent text-primary hover:bg-surface-container",
         secondary: "bg-surface-container text-on-surface hover:bg-surface-container-high",
         ghost: "hover:bg-surface-container text-on-surface",
@@ -40,9 +41,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+      <m.button
         ref={ref}
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...BUTTON_HOVER}
         {...props}
       />
     )
