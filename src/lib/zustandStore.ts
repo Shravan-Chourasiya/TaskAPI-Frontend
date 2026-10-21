@@ -1,125 +1,62 @@
-import { persist } from "zustand/middleware";
 import { create } from "zustand";
-import { apiInstance } from "./axiosInstance";
+import type { AuthStore, PlanStore } from "@/lib/zustandStore.type";
+import { apiInstance, setCsrfToken } from "@/lib/axiosInstance";
 import { API_ENDPOINTS, DICEBEAR_AVATAR_API } from "@/constants";
-import type { AuthStore, PlanStore, User } from "./zustandStore.type";
 
 export const authStore = create<AuthStore>((set, get) => ({
 	isAuthenticated: false,
+	isLoading: false,
 	user: null,
-	isLoading: true,
+
+	setLoading: (loading) => set({ isLoading: loading }),
+	setUser: (user) => set({ user }),
+	setAuthenticated: (authenticated) => set({ isAuthenticated: authenticated }),
+
 	getAvatarUrl: () => {
 		const user = get().user;
-		return (
-			user?.profile?.avatarUrl ||
-			`${DICEBEAR_AVATAR_API}?seed=${user?.email || user?.username || "default"}`
-		);
+		if (user?.profile?.avatarUrl) return user.profile.avatarUrl;
+		const seed = user?.username ?? "default";
+		return `${DICEBEAR_AVATAR_API}?seed=${seed}`;
 	},
 
-	login: async (email: string, password: string) => {
+	login: async (email, password) => {
 		set({ isLoading: true });
-		try {
-			const response = await apiInstance.post(API_ENDPOINTS.AUTH.LOGIN, {
-				email,
-				password,
-			});
-			if (!response.data || !response.data.data) {
-				throw new Error(
-					"Invalid response from server. Failed to Login. Try again later",
-				);
-			}
-			set({
-				isAuthenticated: true,
-				user: response.data.data,
-				isLoading: false,
-			});
-		} catch (error) {
-			console.error("Login failed:", error);
-			set({ isAuthenticated: false, user: null, isLoading: false });
-			throw new Error(
-				"Login failed. Please check your credentials and try again.",
-			);
-		}
+		const res = await apiInstance.post(API_ENDPOINTS.AUTH.LOGIN, { email, password });
+		set({ isAuthenticated: true, user: res.data.data.user, isLoading: false });
 	},
 
 	logout: async () => {
-		set({ isLoading: true });
-		try {
-			const response = await apiInstance.post(API_ENDPOINTS.AUTH.LOGOUT);
-			if (response.status !== 200) {
-				console.error("Logout failed with status:", response.status);
-				throw new Error(`Logout failed with status: ${response.status}`);
-			}
-			console.log("Logout successful");
-			set({ isAuthenticated: false, user: null, isLoading: false });
-			window.location.href = "/";
-		} catch (error) {
-			console.error("Logout failed:", error);
-			set({ isLoading: false });
-			throw new Error("Logout failed. Please try again.");
-		}
+		await apiInstance.post(API_ENDPOINTS.AUTH.LOGOUT);
+		setCsrfToken(null);
+		set({ isAuthenticated: false, user: null });
 	},
 
 	refreshUser: async () => {
-		set({ isLoading: true });
-		try {
-			const response = await apiInstance.get(API_ENDPOINTS.USER.IS_USER);
-			if (!response.data || !response.data.data) {
-				throw new Error(
-					"Invalid response from server. Failed to refresh user. Try again later",
-				);
-			}
-			if (!response.data.data.isUser) {
-				set({ isAuthenticated: false, user: null, isLoading: false });
-				return;
-			}
-			set({ user: response.data.data.user, isLoading: false });
-		} catch (error) {
-			console.error("Failed to refresh user:", error);
-			set({ isAuthenticated: false, user: null, isLoading: false });
-		}
+		const res = await apiInstance.get(API_ENDPOINTS.USER.IS_USER);
+		set({ user: res.data.data.user });
 	},
 
 	checkAuth: async () => {
 		set({ isLoading: true });
 		try {
-			const response = await apiInstance.get(API_ENDPOINTS.USER.IS_USER);
-			if (
-				response.status === 200 &&
-				response.data &&
-				response.data.data &&
-				response.data.data.isUser
-			) {
-				set({
-					isAuthenticated: true,
-					user: response.data.data.user,
-					isLoading: false,
-				});
-			} else {
-				set({ isAuthenticated: false, user: null, isLoading: false });
-			}
+			const res = await apiInstance.get(API_ENDPOINTS.USER.IS_USER);
+			set({ isAuthenticated: true, user: res.data.data.user });
 		} catch {
-			set({ isAuthenticated: false, user: null, isLoading: false });
+			set({ isAuthenticated: false, user: null });
+		} finally {
+			set({ isLoading: false });
 		}
 	},
-
-	setLoading: (loading: boolean) => set({ isLoading: loading }),
-	setAuthenticated: (authenticated: boolean) =>
-		set({ isAuthenticated: authenticated }),
-	setUser: (user: User | null) => set({ user }),
 }));
 
-export const usePlanStore = create<PlanStore>()(
-	persist(
-		(set) => ({
-			selectedPlan: null,
-			setSelectedPlan: (plan) => set({ selectedPlan: plan }),
-			clearSelectedPlan: () => set({ selectedPlan: null }),
-		}),
-		{
-			name: "plan-storage",
-			version: 2, // bump to clear stale persisted plan data with old string prices
-			migrate: () => ({ selectedPlan: null }),
-		},
-	),
-);
+export const planStore = create<PlanStore>((set) => ({
+	selectedPlan: null,
+	setSelectedPlan: (plan) => set({ selectedPlan: plan }),
+	clearSelectedPlan: () => set({ selectedPlan: null }),
+}));
+
+// Alias used across the codebase
+export const usePlanStore = planStore;
+
+// Alias used across the codebase
+export const usePlanStore = planStore;

@@ -26,8 +26,8 @@ export const API_ENDPOINTS = {
 		IS_USER: "/api/v1/is-user",
 	},
 	SUBSCRIPTION: {
-		BUY: "/api/v1/subscription/create-order",
-		VERIFY_PAYMENT: "/api/v1/subscription/verify-payment",
+		BUY: "/api/v1/subscription/order",
+		VERIFY_PAYMENT: "/api/v1/subscription/order/verify",
 	},
 	APIKEY: {
 		CREATE: "/api/v1/api-keys/create/apikey",
@@ -63,7 +63,7 @@ export const DICEBEAR_AVATAR_API = 'https://api.dicebear.com/7.x/avataaars/svg';
 export const RAZORPAY_SCRIPT_URL = 'https://checkout.razorpay.com/v1/checkout.js';
 
 // App branding
-export const APP_NAME = 'TaskAPI';
+export const APP_NAME = 'Authrix';
 export const PRIMARY_COLOR = '#00685f';
 
 // Timeouts

@@ -8,11 +8,11 @@ const PaymentSuccess = () => {
   const { plan, amount } = location.state || {};
 
   useEffect(() => {
-    // Redirect if no payment data
-    if (!plan || !amount) {
+    // Redirect if no payment data (allow amount === 0 for Free plan)
+    if (!plan) {
       navigate('/pricing');
     }
-  }, [plan, amount, navigate]);
+  }, [plan, navigate]);
 
   const getBillingDate = () => {
     const nextBillingDate = new Date();
@@ -45,16 +45,16 @@ const PaymentSuccess = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-secondary">Amount Paid</span>
-              <span className="font-bold text-on-surface">${amount}</span>
+              <span className="font-bold text-on-surface">{amount === 0 ? 'Free' : `₹${amount}`}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-secondary">Billing Cycle</span>
-              <span className="font-bold text-on-surface">Monthly</span>
+              <span className="font-bold text-on-surface">12 Months</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-secondary">Next Billing Date</span>
               <span className="font-bold text-on-surface">
-                {getBillingDate()}
+                {amount === 0 ? 'N/A' : getBillingDate()}
               </span>
             </div>
           </div>

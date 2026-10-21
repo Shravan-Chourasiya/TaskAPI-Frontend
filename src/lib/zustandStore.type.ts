@@ -3,6 +3,8 @@ export type User = {
 	username: string;
 	status: string;
 	role: string[];
+	subscriptionType?: string;
+	subscriptionExpiryDate?: string;
 	profile?: {
 		firstName?: string;
 		lastName?: string;
